@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.LongAdder;
 public final class InternalProfiler {
 
     public static final long DISABLED_TOKEN = Long.MIN_VALUE;
-    public static final long[] FRAME_THRESHOLDS_NANOS = { 16_670_000L, 33_330_000L, 50_000_000L, 100_000_000L,
+    private static final long[] FRAME_THRESHOLDS_NANOS = { 16_670_000L, 33_330_000L, 50_000_000L, 100_000_000L,
         250_000_000L };
 
     private static final InternalProfiler INSTANCE = new InternalProfiler(8192, 2048);
@@ -20,8 +20,6 @@ public final class InternalProfiler {
     private final ProfilerConfig config = new ProfilerConfig();
     private final DurationSeries frames;
     private final DurationSeries ticks;
-    private final AtomicLong frameSequence = new AtomicLong();
-    private final AtomicLong tickSequence = new AtomicLong();
     private final LongAdder[] frameThresholdCounts = new LongAdder[FRAME_THRESHOLDS_NANOS.length];
     private final SectionAccumulator[] sections = new SectionAccumulator[ProfilerSection.values().length];
     private final AtomicLong queuedTasks = new AtomicLong();
@@ -29,6 +27,8 @@ public final class InternalProfiler {
     private final LongAdder submittedTasks = new LongAdder();
     private final LongAdder completedTasks = new LongAdder();
 
+    private long frameSequence;
+    private long tickSequence;
     private volatile long currentFrameId;
     private volatile long currentTickId;
     private volatile File automaticExportDirectory;
@@ -62,7 +62,7 @@ public final class InternalProfiler {
         if (!config.isGroupEnabled(ProfilerGroup.FRAME)) {
             return DISABLED_TOKEN;
         }
-        currentFrameId = frameSequence.incrementAndGet();
+        currentFrameId = ++frameSequence;
         return System.nanoTime();
     }
 
@@ -78,7 +78,7 @@ public final class InternalProfiler {
         if (!config.isGroupEnabled(ProfilerGroup.TICK)) {
             return DISABLED_TOKEN;
         }
-        currentTickId = tickSequence.incrementAndGet();
+        currentTickId = ++tickSequence;
         return System.nanoTime();
     }
 
