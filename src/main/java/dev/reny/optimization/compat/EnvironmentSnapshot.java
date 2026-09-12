@@ -100,17 +100,32 @@ public final class EnvironmentSnapshot {
     public List<String> toDiagnosticLines() {
         ArrayList<String> lines = new ArrayList<String>();
         lines.add(
-            "side=" + side + " java=" + javaVendor + " " + javaVersion + " os=" + osName + " " + osVersion + " "
-                + osArch + " renderer=" + rendererPath + " shaders=" + shaderPath + " capabilities=" + capabilities);
+            "side=" + side
+                + " java="
+                + javaVendor
+                + " "
+                + javaVersion
+                + " os="
+                + osName
+                + " "
+                + osVersion
+                + " "
+                + osArch
+                + " renderer="
+                + rendererPath
+                + " shaders="
+                + shaderPath
+                + " capabilities="
+                + capabilities);
         for (DetectedMod mod : mods.values()) {
-            lines.add(
-                "mod " + mod.getId() + " version=" + mod.getVersion() + (mod.isSynthetic() ? " synthetic" : ""));
+            lines.add("mod " + mod.getId() + " version=" + mod.getVersion() + (mod.isSynthetic() ? " synthetic" : ""));
         }
         return Collections.unmodifiableList(lines);
     }
 
     private static String valueOrUnknown(String value) {
-        return value == null || value.trim().isEmpty() ? "unknown" : value.trim();
+        return value == null || value.trim()
+            .isEmpty() ? "unknown" : value.trim();
     }
 
     public static final class Builder {

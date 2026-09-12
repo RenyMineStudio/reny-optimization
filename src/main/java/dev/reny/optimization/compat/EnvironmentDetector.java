@@ -133,7 +133,8 @@ public final class EnvironmentDetector {
     private static String property(String name) {
         try {
             String value = System.getProperty(name);
-            return value == null || value.trim().isEmpty() ? "unknown" : value;
+            return value == null || value.trim()
+                .isEmpty() ? "unknown" : value;
         } catch (SecurityException ignored) {
             return "unknown";
         }

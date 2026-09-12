@@ -2,6 +2,7 @@ package dev.reny.optimization.compat;
 
 /** Optimization/runtime mods for which Reny has explicit compatibility policy. */
 public enum KnownMod {
+
     FORGE_FML("forge-fml", "Forge/FML", "forge", "fml"),
     UNIMIXINS("unimixins", "UniMixins", "unimixins"),
     ANGELICA("angelica", "Angelica", "angelica"),

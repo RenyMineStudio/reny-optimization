@@ -44,10 +44,12 @@ public final class DetectedMod {
     }
 
     static String normalizeId(String value) {
-        return valueOrUnknown(value).trim().toLowerCase(Locale.ROOT);
+        return valueOrUnknown(value).trim()
+            .toLowerCase(Locale.ROOT);
     }
 
     private static String valueOrUnknown(String value) {
-        return value == null || value.trim().isEmpty() ? "unknown" : value.trim();
+        return value == null || value.trim()
+            .isEmpty() ? "unknown" : value.trim();
     }
 }

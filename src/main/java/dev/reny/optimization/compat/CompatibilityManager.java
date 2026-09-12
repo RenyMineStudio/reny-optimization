@@ -49,7 +49,10 @@ public final class CompatibilityManager {
         }
 
         if (descriptor.getSide() == PatchSide.CLIENT && environment.getSide() == EnvironmentSide.DEDICATED_SERVER) {
-            return decision(descriptor, CompatibilityState.CONFLICT, "client-only patch cannot run on a dedicated server");
+            return decision(
+                descriptor,
+                CompatibilityState.CONFLICT,
+                "client-only patch cannot run on a dedicated server");
         }
         if (descriptor.getSide() == PatchSide.CLIENT && environment.getSide() == EnvironmentSide.UNKNOWN) {
             return decision(descriptor, CompatibilityState.UNKNOWN, "physical side is unknown for a client-only patch");
@@ -107,7 +110,10 @@ public final class CompatibilityManager {
                     CompatibilityState.PARTIAL,
                     "Mixin is available but UniMixins itself was not identified");
             }
-            return targetDecision(knownMod, CompatibilityState.COMPATIBLE, "not detected; no coexistence rule is active");
+            return targetDecision(
+                knownMod,
+                CompatibilityState.COMPATIBLE,
+                "not detected; no coexistence rule is active");
         }
 
         if (knownMod == KnownMod.ANGELICA && environment.hasMod(KnownMod.OPTIFINE)
@@ -135,7 +141,8 @@ public final class CompatibilityManager {
                 return targetDecision(
                     knownMod,
                     CompatibilityState.PARTIAL,
-                    "detected " + mod.getVersion() + "; Angelica owns renderer, chunk-renderer, shader, texture, and GL paths");
+                    "detected " + mod.getVersion()
+                        + "; Angelica owns renderer, chunk-renderer, shader, texture, and GL paths");
             case ARCHAIC_FIX:
                 return targetDecision(
                     knownMod,
@@ -145,12 +152,14 @@ public final class CompatibilityManager {
                 return targetDecision(
                     knownMod,
                     CompatibilityState.PARTIAL,
-                    "detected " + mod.getVersion() + "; chunk-rendering and selected renderer/texture features may overlap");
+                    "detected " + mod.getVersion()
+                        + "; chunk-rendering and selected renderer/texture features may overlap");
             case OPTIFINE:
                 return targetDecision(
                     knownMod,
                     CompatibilityState.PARTIAL,
-                    "detected " + mod.getVersion() + "; non-graphics patches may coexist while equivalent graphics paths conflict");
+                    "detected " + mod.getVersion()
+                        + "; non-graphics patches may coexist while equivalent graphics paths conflict");
             case LWJGL3IFY:
                 return targetDecision(
                     knownMod,
@@ -211,7 +220,8 @@ public final class CompatibilityManager {
                 mod,
                 "FalseTweaks already provides an overlapping chunk-renderer path");
         }
-        if (features.contains(CompatibilityFeature.RENDERER) || features.contains(CompatibilityFeature.TEXTURE_PIPELINE)) {
+        if (features.contains(CompatibilityFeature.RENDERER)
+            || features.contains(CompatibilityFeature.TEXTURE_PIPELINE)) {
             if (!mod.isVersionKnown() && descriptor.getRisk() != PatchRisk.SAFE) {
                 return ruleDecision(
                     descriptor,
@@ -294,10 +304,7 @@ public final class CompatibilityManager {
 
     private static CompatibilityDecision ruleDecision(PatchDescriptor descriptor, CompatibilityState state,
         DetectedMod mod, String detail) {
-        return decision(
-            descriptor,
-            state,
-            detail + " (detected " + mod.getName() + " " + mod.getVersion() + ")");
+        return decision(descriptor, state, detail + " (detected " + mod.getName() + " " + mod.getVersion() + ")");
     }
 
     private static CompatibilityDecision decision(PatchDescriptor descriptor, CompatibilityState state, String detail) {

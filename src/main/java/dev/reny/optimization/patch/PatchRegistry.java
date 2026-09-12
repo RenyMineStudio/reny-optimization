@@ -128,9 +128,8 @@ public final class PatchRegistry {
             if (compatibility != null) {
                 PatchDecisionReason compatibilityReason = disabledCompatibilityReason(compatibility.getState());
                 if (compatibilityReason != null) {
-                    decisions.put(
-                        id,
-                        PatchDecision.disabled(descriptor, compatibilityReason, compatibility.getDetail()));
+                    decisions
+                        .put(id, PatchDecision.disabled(descriptor, compatibilityReason, compatibility.getDetail()));
                     continue;
                 }
             }

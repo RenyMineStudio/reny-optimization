@@ -8,7 +8,8 @@ public final class CompatibilityDecision {
     private final String detail;
 
     public CompatibilityDecision(String target, CompatibilityState state, String detail) {
-        if (target == null || target.trim().isEmpty()) {
+        if (target == null || target.trim()
+            .isEmpty()) {
             throw new IllegalArgumentException("target must not be blank");
         }
         if (state == null) {
@@ -16,7 +17,8 @@ public final class CompatibilityDecision {
         }
         this.target = target.trim();
         this.state = state;
-        this.detail = detail == null || detail.trim().isEmpty() ? "no detail" : detail.trim();
+        this.detail = detail == null || detail.trim()
+            .isEmpty() ? "no detail" : detail.trim();
     }
 
     public String getTarget() {

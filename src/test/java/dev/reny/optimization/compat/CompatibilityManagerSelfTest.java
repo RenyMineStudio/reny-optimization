@@ -42,8 +42,10 @@ public final class CompatibilityManagerSelfTest {
             .renderer(RendererPath.ANGELICA, ShaderPath.ANGELICA)
             .build();
         assertTrue(snapshot.hasMod(KnownMod.ANGELICA));
-        assertEquals("2.0.0", snapshot.findMod(KnownMod.ANGELICA)
-            .getVersion());
+        assertEquals(
+            "2.0.0",
+            snapshot.findMod(KnownMod.ANGELICA)
+                .getVersion());
         assertTrue(snapshot.hasCapability(EnvironmentCapability.FORGE_FML));
         assertTrue(snapshot.hasCapability(EnvironmentCapability.SHADERS));
         pass();
@@ -65,7 +67,9 @@ public final class CompatibilityManagerSelfTest {
         PatchDescriptor patch = patch("render.native", PatchRisk.NUCLEAR)
             .compatibilityFeature(CompatibilityFeature.RENDERER)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.NUCLEAR, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.NUCLEAR, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_REPLACED);
         pass();
     }
@@ -78,7 +82,9 @@ public final class CompatibilityManagerSelfTest {
         PatchDescriptor patch = patch("shader.pipeline", PatchRisk.EXPERIMENTAL)
             .compatibilityFeature(CompatibilityFeature.SHADER_PIPELINE)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.NUCLEAR, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.NUCLEAR, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_CONFLICT);
         pass();
     }
@@ -90,7 +96,9 @@ public final class CompatibilityManagerSelfTest {
         PatchDescriptor patch = patch("world.lighting", PatchRisk.AGGRESSIVE)
             .compatibilityFeature(CompatibilityFeature.LIGHTING_ENGINE)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.AGGRESSIVE, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.AGGRESSIVE, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_REPLACED);
         pass();
     }
@@ -102,7 +110,9 @@ public final class CompatibilityManagerSelfTest {
         PatchDescriptor patch = patch("render.chunks", PatchRisk.EXPERIMENTAL)
             .compatibilityFeature(CompatibilityFeature.CHUNK_RENDERER)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.NUCLEAR, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.NUCLEAR, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_REPLACED);
         pass();
     }
@@ -115,7 +125,9 @@ public final class CompatibilityManagerSelfTest {
         PatchDescriptor patch = patch("render.opengl_backend", PatchRisk.AGGRESSIVE)
             .compatibilityFeature(CompatibilityFeature.OPENGL_BACKEND)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.AGGRESSIVE, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.AGGRESSIVE, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_UNKNOWN);
         pass();
     }
@@ -130,9 +142,10 @@ public final class CompatibilityManagerSelfTest {
             .build();
         PatchSnapshot snapshot = resolve(manager, OptimizationProfile.AGGRESSIVE, patch);
         assertEnabled(snapshot, patch.getId());
-        assertTrue(snapshot.getDecision(patch.getId())
-            .getDetail()
-            .contains("compatibility=PARTIAL"));
+        assertTrue(
+            snapshot.getDecision(patch.getId())
+                .getDetail()
+                .contains("compatibility=PARTIAL"));
         pass();
     }
 
@@ -143,9 +156,10 @@ public final class CompatibilityManagerSelfTest {
             .build();
         PatchSnapshot snapshot = resolve(manager, OptimizationProfile.COMPATIBLE, patch);
         assertReason(snapshot, patch.getId(), PatchDecisionReason.COMPATIBILITY_CONFLICT);
-        assertTrue(snapshot.getDecision(patch.getId())
-            .getDetail()
-            .contains("UNIMIXINS"));
+        assertTrue(
+            snapshot.getDecision(patch.getId())
+                .getDetail()
+                .contains("UNIMIXINS"));
         pass();
     }
 
@@ -160,7 +174,9 @@ public final class CompatibilityManagerSelfTest {
                 .build());
         PatchDescriptor patch = patch("render.client_only", PatchRisk.SAFE).side(PatchSide.CLIENT)
             .build();
-        assertReason(resolve(manager, OptimizationProfile.COMPATIBLE, patch), patch.getId(),
+        assertReason(
+            resolve(manager, OptimizationProfile.COMPATIBLE, patch),
+            patch.getId(),
             PatchDecisionReason.COMPATIBILITY_CONFLICT);
         pass();
     }
