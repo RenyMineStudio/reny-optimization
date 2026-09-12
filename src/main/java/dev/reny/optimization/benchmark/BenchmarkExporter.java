@@ -20,11 +20,19 @@ public final class BenchmarkExporter {
     private BenchmarkExporter() {}
 
     public static File export(BenchmarkResult result, File outputRoot) {
-        File scenario = new File(outputRoot, result.getScenario().getId());
-        File commit = new File(scenario, safePath(result.getEnvironment().getRenyCommitSha()));
+        File scenario = new File(
+            outputRoot,
+            result.getScenario()
+                .getId());
+        File commit = new File(
+            scenario,
+            safePath(
+                result.getEnvironment()
+                    .getRenyCommitSha()));
         File directory = new File(commit, safePath(result.getRunId()));
         if (directory.exists() || !directory.mkdirs()) {
-            throw new IllegalStateException("Benchmark run directory already exists or cannot be created: " + directory);
+            throw new IllegalStateException(
+                "Benchmark run directory already exists or cannot be created: " + directory);
         }
         try {
             writeEnvironment(result, new File(directory, "environment.json"));
@@ -45,7 +53,11 @@ public final class BenchmarkExporter {
             out.println("{");
             out.println("  \"schema_version\": " + BenchmarkResult.SCHEMA_VERSION + ',');
             out.println("  \"run_id\": " + quote(result.getRunId()) + ',');
-            out.println("  \"benchmark_id\": " + quote(result.getScenario().getId()) + ',');
+            out.println(
+                "  \"benchmark_id\": " + quote(
+                    result.getScenario()
+                        .getId())
+                    + ',');
             out.println("  \"reny\": {");
             out.println("    \"version\": " + quote(environment.getRenyVersion()) + ',');
             out.println("    \"commit_sha\": " + quote(environment.getRenyCommitSha()));
@@ -123,8 +135,16 @@ public final class BenchmarkExporter {
             out.println("{");
             out.println("  \"schema_version\": " + BenchmarkResult.SCHEMA_VERSION + ',');
             out.println("  \"run_id\": " + quote(result.getRunId()) + ',');
-            out.println("  \"benchmark_id\": " + quote(result.getScenario().getId()) + ',');
-            out.println("  \"benchmark_name\": " + quote(result.getScenario().getDisplayName()) + ',');
+            out.println(
+                "  \"benchmark_id\": " + quote(
+                    result.getScenario()
+                        .getId())
+                    + ',');
+            out.println(
+                "  \"benchmark_name\": " + quote(
+                    result.getScenario()
+                        .getDisplayName())
+                    + ',');
             out.println("  \"warmup\": {");
             out.println("    \"started_at_ms\": " + result.getWarmupStartedAtMillis() + ',');
             out.println("    \"configured_ms\": " + result.getConfiguredWarmupMillis() + ',');
@@ -145,9 +165,13 @@ public final class BenchmarkExporter {
             out.println("    \"heap_end_bytes\": " + end.getHeapUsedBytes() + ',');
             out.println("    \"heap_delta_bytes\": " + (end.getHeapUsedBytes() - start.getHeapUsedBytes()) + ',');
             out.println("    \"gc_count\": " + nonNegativeDelta(end.getGcCount(), start.getGcCount()) + ',');
-            out.println("    \"gc_time_ms\": " + nonNegativeDelta(end.getGcTimeMillis(), start.getGcTimeMillis()) + ',');
-            out.println("    \"submitted_tasks\": " + nonNegativeDelta(end.getSubmittedTasks(), start.getSubmittedTasks()) + ',');
-            out.println("    \"completed_tasks\": " + nonNegativeDelta(end.getCompletedTasks(), start.getCompletedTasks()));
+            out.println(
+                "    \"gc_time_ms\": " + nonNegativeDelta(end.getGcTimeMillis(), start.getGcTimeMillis()) + ',');
+            out.println(
+                "    \"submitted_tasks\": " + nonNegativeDelta(end.getSubmittedTasks(), start.getSubmittedTasks())
+                    + ',');
+            out.println(
+                "    \"completed_tasks\": " + nonNegativeDelta(end.getCompletedTasks(), start.getCompletedTasks()));
             out.println("  },");
             out.println("  \"files\": {");
             out.println("    \"environment\": \"environment.json\",");
@@ -199,8 +223,13 @@ public final class BenchmarkExporter {
     private static void writeThreshold(PrintWriter out, BenchmarkStatistics statistics, int index, String name,
         boolean trailingComma) {
         out.println(
-            "      " + quote(name) + ": {\"count\": " + statistics.getFrameThresholdCount(index) + ", \"rate\": "
-                + statistics.getFrameThresholdRate(index) + '}' + (trailingComma ? "," : ""));
+            "      " + quote(name)
+                + ": {\"count\": "
+                + statistics.getFrameThresholdCount(index)
+                + ", \"rate\": "
+                + statistics.getFrameThresholdRate(index)
+                + '}'
+                + (trailingComma ? "," : ""));
     }
 
     private static void writeSeries(DurationSeriesSnapshot series, File file, String idName, String correlationName)
@@ -210,7 +239,8 @@ public final class BenchmarkExporter {
             out.println(idName + ',' + correlationName + ",duration_ns,duration_ms");
             for (int i = 0; i < series.size(); i++) {
                 long duration = series.getDurationNanos(i);
-                out.println(series.getId(i) + "," + series.getCorrelationId(i) + "," + duration + "," + millis(duration));
+                out.println(
+                    series.getId(i) + "," + series.getCorrelationId(i) + "," + duration + "," + millis(duration));
             }
         } finally {
             out.close();
@@ -220,8 +250,13 @@ public final class BenchmarkExporter {
     private static void writeMods(PrintWriter out, List<ModInfo> mods) {
         for (int i = 0; i < mods.size(); i++) {
             ModInfo mod = mods.get(i);
-            out.print("      {\"id\": " + quote(mod.getId()) + ", \"name\": " + quote(mod.getName())
-                + ", \"version\": " + quote(mod.getVersion()) + '}');
+            out.print(
+                "      {\"id\": " + quote(mod.getId())
+                    + ", \"name\": "
+                    + quote(mod.getName())
+                    + ", \"version\": "
+                    + quote(mod.getVersion())
+                    + '}');
             out.println(i + 1 < mods.size() ? "," : "");
         }
     }
@@ -282,11 +317,13 @@ public final class BenchmarkExporter {
                     break;
             }
         }
-        return escaped.append('"').toString();
+        return escaped.append('"')
+            .toString();
     }
 
     private static String safePath(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null || value.trim()
+            .isEmpty()) {
             return "unknown";
         }
         return value.replaceAll("[^A-Za-z0-9._-]", "_");

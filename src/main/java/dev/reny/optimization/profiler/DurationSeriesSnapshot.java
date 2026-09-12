@@ -46,7 +46,9 @@ public final class DurationSeriesSnapshot {
     /**
      * Returns only retained samples whose monotonic ID is greater than {@code exclusiveId}.
      *
-     * <p>This is primarily used by benchmark sessions to exclude warmup samples without resetting the global profiler.</p>
+     * <p>
+     * This is primarily used by benchmark sessions to exclude warmup samples without resetting the global profiler.
+     * </p>
      */
     public DurationSeriesSnapshot afterId(long exclusiveId) {
         int first = 0;

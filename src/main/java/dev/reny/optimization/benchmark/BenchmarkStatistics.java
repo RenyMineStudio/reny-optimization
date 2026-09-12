@@ -41,7 +41,17 @@ public final class BenchmarkStatistics {
     public static BenchmarkStatistics from(DurationSeriesSnapshot series, boolean frameSeries) {
         int count = series.size();
         if (count == 0) {
-            return new BenchmarkStatistics(0L, 0L, 0L, 0.0D, 0.0D, 0L, 0L, 0L, 0L, 0L,
+            return new BenchmarkStatistics(
+                0L,
+                0L,
+                0L,
+                0.0D,
+                0.0D,
+                0L,
+                0L,
+                0L,
+                0L,
+                0L,
                 new long[FRAME_THRESHOLDS_NANOS.length]);
         }
 

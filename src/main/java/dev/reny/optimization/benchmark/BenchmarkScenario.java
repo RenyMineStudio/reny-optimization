@@ -5,7 +5,8 @@ public enum BenchmarkScenario {
 
     STATIONARY_RENDER("BENCH-01", "Stationary render", "Renderer baseline and static-scene frame-time distribution"),
     CHUNK_TRAVERSAL("BENCH-02", "Chunk traversal", "Chunk streaming, generation, lighting, meshing, upload, and I/O"),
-    INDUSTRIAL_BASE("BENCH-03", "Industrial base", "TileEntity, Forge-event, machine-network, and complex-block pressure"),
+    INDUSTRIAL_BASE("BENCH-03", "Industrial base",
+        "TileEntity, Forge-event, machine-network, and complex-block pressure"),
     ENTITY_STRESS("BENCH-04", "Entity stress", "Entity AI, collision, allocation, ticking, and rendering"),
     LIGHTING_TORTURE("BENCH-05", "Lighting torture", "Large-scale block-light and sky-light propagation"),
     SHADER_TORTURE("BENCH-06", "Shader torture", "Expensive shader passes and CPU/GPU renderer interaction"),

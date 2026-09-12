@@ -24,10 +24,10 @@ public final class BenchmarkResult {
     private final ProfilerSnapshot.RuntimeSnapshot runtimeEnd;
 
     BenchmarkResult(String runId, BenchmarkScenario scenario, BenchmarkEnvironment environment,
-        long warmupStartedAtMillis, long measurementStartedAtMillis, long completedAtMillis, long configuredWarmupMillis,
-        long configuredMeasurementMillis, long actualWarmupNanos, long actualMeasurementNanos,
-        DurationSeriesSnapshot frames, DurationSeriesSnapshot ticks, ProfilerSnapshot.RuntimeSnapshot runtimeStart,
-        ProfilerSnapshot.RuntimeSnapshot runtimeEnd) {
+        long warmupStartedAtMillis, long measurementStartedAtMillis, long completedAtMillis,
+        long configuredWarmupMillis, long configuredMeasurementMillis, long actualWarmupNanos,
+        long actualMeasurementNanos, DurationSeriesSnapshot frames, DurationSeriesSnapshot ticks,
+        ProfilerSnapshot.RuntimeSnapshot runtimeStart, ProfilerSnapshot.RuntimeSnapshot runtimeEnd) {
         this.runId = runId;
         this.scenario = scenario;
         this.environment = environment;

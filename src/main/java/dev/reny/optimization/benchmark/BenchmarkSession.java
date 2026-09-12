@@ -55,7 +55,11 @@ public final class BenchmarkSession {
         this.configuredMeasurementMillis = configuredMeasurementMillis;
         this.outputRoot = outputRoot;
         this.clock = clock;
-        runId = "run-" + clock.currentTimeMillis() + '-' + UUID.randomUUID().toString().substring(0, 8);
+        runId = "run-" + clock.currentTimeMillis()
+            + '-'
+            + UUID.randomUUID()
+                .toString()
+                .substring(0, 8);
     }
 
     public void startWarmup() {
@@ -96,8 +100,10 @@ public final class BenchmarkSession {
         long completedNanos = clock.nanoTime();
         long completedAtMillis = clock.currentTimeMillis();
         ProfilerSnapshot end = profiler.snapshot();
-        DurationSeriesSnapshot frames = end.getFrames().afterId(frameCutoffId);
-        DurationSeriesSnapshot ticks = end.getTicks().afterId(tickCutoffId);
+        DurationSeriesSnapshot frames = end.getFrames()
+            .afterId(frameCutoffId);
+        DurationSeriesSnapshot ticks = end.getTicks()
+            .afterId(tickCutoffId);
         BenchmarkResult result = new BenchmarkResult(
             runId,
             scenario,
@@ -148,6 +154,7 @@ public final class BenchmarkSession {
     }
 
     private enum SystemClock implements BenchmarkClock {
+
         INSTANCE;
 
         @Override

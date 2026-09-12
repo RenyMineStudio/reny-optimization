@@ -14,7 +14,9 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import dev.reny.optimization.Tags;
 
-/** Best-effort local environment capture. Discovery failures are represented as unknown values, never network lookups. */
+/**
+ * Best-effort local environment capture. Discovery failures are represented as unknown values, never network lookups.
+ */
 public final class BenchmarkEnvironment {
 
     public static final String MINECRAFT_VERSION = "1.7.10";
@@ -53,13 +55,17 @@ public final class BenchmarkEnvironment {
         javaVendor = property("java.vendor", "unknown");
         javaVersion = property("java.version", "unknown");
         javaVm = property("java.vm.name", "unknown");
-        jvmArguments = Collections.unmodifiableList(new ArrayList<String>(ManagementFactory.getRuntimeMXBean().getInputArguments()));
+        jvmArguments = Collections.unmodifiableList(
+            new ArrayList<String>(
+                ManagementFactory.getRuntimeMXBean()
+                    .getInputArguments()));
         osName = property("os.name", "unknown");
         osVersion = property("os.version", "unknown");
         osArch = property("os.arch", "unknown");
         kernel = discoverKernel();
         cpu = discoverCpu();
-        availableProcessors = Runtime.getRuntime().availableProcessors();
+        availableProcessors = Runtime.getRuntime()
+            .availableProcessors();
         physicalRamBytes = discoverPhysicalRam();
         OpenGlInfo gl = discoverOpenGl();
         gpuVendor = property("reny.benchmark.gpu.vendor", gl.vendor);
@@ -87,7 +93,8 @@ public final class BenchmarkEnvironment {
     private static List<ModInfo> discoverMods() {
         List<ModInfo> result = new ArrayList<ModInfo>();
         try {
-            for (ModContainer container : Loader.instance().getActiveModList()) {
+            for (ModContainer container : Loader.instance()
+                .getActiveModList()) {
                 result.add(new ModInfo(container.getModId(), container.getName(), container.getVersion()));
             }
         } catch (Throwable ignored) {
@@ -97,7 +104,9 @@ public final class BenchmarkEnvironment {
     }
 
     private static String discoverCommitSha() {
-        String explicit = firstNonBlank(safeSystemProperty("reny.commit.sha"), safeEnvironment("RENY_COMMIT_SHA"),
+        String explicit = firstNonBlank(
+            safeSystemProperty("reny.commit.sha"),
+            safeEnvironment("RENY_COMMIT_SHA"),
             safeEnvironment("GITHUB_SHA"));
         if (explicit != null) {
             return explicit;
@@ -107,9 +116,14 @@ public final class BenchmarkEnvironment {
             File head = new File(git, "HEAD");
             String value = readFirstLine(head);
             if (value != null && value.startsWith("ref: ")) {
-                value = readFirstLine(new File(git, value.substring(5).trim()));
+                value = readFirstLine(
+                    new File(
+                        git,
+                        value.substring(5)
+                            .trim()));
             }
-            if (value != null && !value.trim().isEmpty()) {
+            if (value != null && !value.trim()
+                .isEmpty()) {
                 return value.trim();
             }
         } catch (RuntimeException ignored) {
@@ -125,7 +139,8 @@ public final class BenchmarkEnvironment {
 
     private static String discoverCpu() {
         String explicit = safeSystemProperty("reny.benchmark.cpu");
-        if (explicit != null && !explicit.trim().isEmpty()) {
+        if (explicit != null && !explicit.trim()
+            .isEmpty()) {
             return explicit;
         }
         File cpuInfo = new File("/proc/cpuinfo");
@@ -136,8 +151,11 @@ public final class BenchmarkEnvironment {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     int colon = line.indexOf(':');
-                    if (colon > 0 && "model name".equalsIgnoreCase(line.substring(0, colon).trim())) {
-                        return line.substring(colon + 1).trim();
+                    if (colon > 0 && "model name".equalsIgnoreCase(
+                        line.substring(0, colon)
+                            .trim())) {
+                        return line.substring(colon + 1)
+                            .trim();
                     }
                 }
             } catch (IOException ignored) {
@@ -147,7 +165,8 @@ public final class BenchmarkEnvironment {
             }
         }
         String identifier = safeEnvironment("PROCESSOR_IDENTIFIER");
-        return identifier == null || identifier.trim().isEmpty() ? property("os.arch", "unknown") : identifier;
+        return identifier == null || identifier.trim()
+            .isEmpty() ? property("os.arch", "unknown") : identifier;
     }
 
     private static long discoverPhysicalRam() {
@@ -163,7 +182,8 @@ public final class BenchmarkEnvironment {
         String[] methods = { "getTotalMemorySize", "getTotalPhysicalMemorySize" };
         for (String methodName : methods) {
             try {
-                Method method = bean.getClass().getMethod(methodName);
+                Method method = bean.getClass()
+                    .getMethod(methodName);
                 Object value = method.invoke(bean);
                 if (value instanceof Number) {
                     return ((Number) value).longValue();
@@ -194,7 +214,8 @@ public final class BenchmarkEnvironment {
 
     private static String property(String name, String fallback) {
         String value = safeSystemProperty(name);
-        return value == null || value.trim().isEmpty() ? fallback : value;
+        return value == null || value.trim()
+            .isEmpty() ? fallback : value;
     }
 
     private static String safeSystemProperty(String name) {
@@ -215,7 +236,8 @@ public final class BenchmarkEnvironment {
 
     private static String firstNonBlank(String... values) {
         for (String value : values) {
-            if (value != null && !value.trim().isEmpty()) {
+            if (value != null && !value.trim()
+                .isEmpty()) {
                 return value.trim();
             }
         }

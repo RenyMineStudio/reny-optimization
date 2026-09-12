@@ -148,7 +148,8 @@ public final class BenchmarkContext {
         }
 
         public Builder extra(String key, String value) {
-            if (key == null || key.trim().isEmpty()) {
+            if (key == null || key.trim()
+                .isEmpty()) {
                 throw new IllegalArgumentException("extra key must not be blank");
             }
             extras.put(key, valueOrUnknown(value));
@@ -160,7 +161,8 @@ public final class BenchmarkContext {
         }
 
         private static String valueOrUnknown(String value) {
-            return value == null || value.trim().isEmpty() ? "unknown" : value;
+            return value == null || value.trim()
+                .isEmpty() ? "unknown" : value;
         }
     }
 }

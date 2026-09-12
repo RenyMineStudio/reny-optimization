@@ -137,7 +137,10 @@ public final class BenchmarkHarnessSelfTest {
         clock.advanceMillis(1L);
         File secondOutput = second.finish();
 
-        check(!first.getRunId().equals(second.getRunId()), "run IDs must be unique");
+        check(
+            !first.getRunId()
+                .equals(second.getRunId()),
+            "run IDs must be unique");
         check(!firstOutput.equals(secondOutput), "repeated runs must use different directories");
         check(firstOutput.isDirectory() && secondOutput.isDirectory(), "both repeated runs preserved");
         pass();
