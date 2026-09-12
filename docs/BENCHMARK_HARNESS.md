@@ -32,7 +32,7 @@ A session has four explicit states:
 
 Warmup is never removed by resetting the global profiler. Instead, `beginMeasurement()` captures the latest monotonic `frame_id` and `tick_id`. Export includes only samples with later IDs. This lets the profiler remain useful to other diagnostics while guaranteeing that retained warmup frames/ticks do not enter benchmark statistics.
 
-The configured durations are guidance for the runner. `shouldBeginMeasurement()` and `shouldFinishMeasurement()` use them without silently changing phases; the caller performs the transition explicitly.
+Configured warmup and measurement durations are enforced. `shouldBeginMeasurement()` and `shouldFinishMeasurement()` report when the transition is legal; calling `beginMeasurement()` or `finish()` early throws instead of silently producing a shortened run. The caller still performs each transition explicitly, so scenario drivers remain deterministic and observable.
 
 Typical use:
 
@@ -166,6 +166,6 @@ Run:
 ./gradlew benchmarkHarnessSelfTest
 ```
 
-The self-test verifies canonical descriptors, measured statistics, warmup exclusion, schema fields, required files, unique run directories, and phase-state validation. `check` includes this task automatically.
+The self-test verifies canonical descriptors, measured statistics, enforced phase durations, warmup exclusion, schema fields, required files, unique run directories, and phase-state validation. `check` includes this task automatically.
 
 For formal comparisons, continue following `docs/PROFILING_PLAN.md`: restart the JVM for important A/B runs, use at least five independent runs, preserve exact settings/config hashes, and do not report only the best run.
