@@ -16,6 +16,14 @@ tasks.register<JavaExec>("patchRegistrySelfTest") {
     mainClass.set("dev.reny.optimization.patch.PatchRegistrySelfTest")
 }
 
+tasks.register<JavaExec>("compatibilitySelfTest") {
+    group = "verification"
+    description = "Runs the dependency-free environment/compatibility self-test suite."
+    dependsOn(tasks.named("testClasses"))
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("dev.reny.optimization.compat.CompatibilityManagerSelfTest")
+}
+
 tasks.register<JavaExec>("profilerSelfTest") {
     group = "verification"
     description = "Runs the dependency-free internal profiler self-test suite."
@@ -41,5 +49,5 @@ tasks.register<JavaExec>("profilerOverheadBenchmark") {
 }
 
 tasks.named("check") {
-    dependsOn("patchRegistrySelfTest", "profilerSelfTest", "benchmarkHarnessSelfTest")
+    dependsOn("patchRegistrySelfTest", "compatibilitySelfTest", "profilerSelfTest", "benchmarkHarnessSelfTest")
 }

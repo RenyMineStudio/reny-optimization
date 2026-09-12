@@ -2,10 +2,15 @@ package dev.reny.optimization.patch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+
+import dev.reny.optimization.compat.CompatibilityFeature;
+import dev.reny.optimization.compat.EnvironmentCapability;
 
 /**
  * Immutable metadata for a Reny optimization patch. This object intentionally
@@ -26,6 +31,8 @@ public final class PatchDescriptor {
     private final List<String> affectedTargets;
     private final List<String> compatibilityNotes;
     private final SortedSet<String> benchmarkIds;
+    private final Set<CompatibilityFeature> compatibilityFeatures;
+    private final Set<EnvironmentCapability> requiredCapabilities;
 
     private PatchDescriptor(Builder builder) {
         this.id = validateId(builder.id);
@@ -38,6 +45,8 @@ public final class PatchDescriptor {
         this.affectedTargets = immutableStrings(builder.affectedTargets, "affected target");
         this.compatibilityNotes = immutableStrings(builder.compatibilityNotes, "compatibility note");
         this.benchmarkIds = immutableTokens(builder.benchmarkIds, "benchmark id");
+        this.compatibilityFeatures = Collections.unmodifiableSet(EnumSet.copyOf(builder.compatibilityFeatures));
+        this.requiredCapabilities = Collections.unmodifiableSet(EnumSet.copyOf(builder.requiredCapabilities));
 
         if (requiredPatchIds.contains(id)) {
             throw new IllegalArgumentException("Patch cannot require itself: " + id);
@@ -140,6 +149,14 @@ public final class PatchDescriptor {
         return benchmarkIds;
     }
 
+    public Set<CompatibilityFeature> getCompatibilityFeatures() {
+        return compatibilityFeatures;
+    }
+
+    public Set<EnvironmentCapability> getRequiredCapabilities() {
+        return requiredCapabilities;
+    }
+
     /**
      * Unsafe patches fail closed until a compatibility/environment layer proves
      * their preconditions. SAFE patches do not require this external proof.
@@ -160,6 +177,8 @@ public final class PatchDescriptor {
         private final List<String> affectedTargets = new ArrayList<String>();
         private final List<String> compatibilityNotes = new ArrayList<String>();
         private final SortedSet<String> benchmarkIds = new TreeSet<String>();
+        private final EnumSet<CompatibilityFeature> compatibilityFeatures = EnumSet.noneOf(CompatibilityFeature.class);
+        private final EnumSet<EnvironmentCapability> requiredCapabilities = EnumSet.noneOf(EnvironmentCapability.class);
 
         private Builder(String id, String module) {
             this.id = id;
@@ -203,6 +222,22 @@ public final class PatchDescriptor {
 
         public Builder benchmark(String benchmarkId) {
             this.benchmarkIds.add(validateToken("benchmark id", benchmarkId));
+            return this;
+        }
+
+        public Builder compatibilityFeature(CompatibilityFeature feature) {
+            if (feature == null) {
+                throw new IllegalArgumentException("compatibility feature must not be null");
+            }
+            compatibilityFeatures.add(feature);
+            return this;
+        }
+
+        public Builder requiresCapability(EnvironmentCapability capability) {
+            if (capability == null) {
+                throw new IllegalArgumentException("required capability must not be null");
+            }
+            requiredCapabilities.add(capability);
             return this;
         }
 

@@ -12,6 +12,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import dev.reny.optimization.compat.CompatibilityDecision;
+import dev.reny.optimization.compat.CompatibilityManager;
+import dev.reny.optimization.compat.CompatibilityState;
+
 /**
  * Central deterministic registry for all Reny optimization patches.
  *
@@ -120,8 +124,24 @@ public final class PatchRegistry {
                 continue;
             }
 
+            CompatibilityDecision compatibility = evaluateCompatibility(request.getCompatibilityManager(), descriptor);
+            if (compatibility != null) {
+                PatchDecisionReason compatibilityReason = disabledCompatibilityReason(compatibility.getState());
+                if (compatibilityReason != null) {
+                    decisions.put(
+                        id,
+                        PatchDecision.disabled(descriptor, compatibilityReason, compatibility.getDetail()));
+                    continue;
+                }
+            }
+
             if (descriptor.requiresVerifiedPreconditions()) {
                 PreconditionStatus status = request.getPreconditionStatus(id);
+                if (status == PreconditionStatus.UNKNOWN && compatibility != null
+                    && (compatibility.getState() == CompatibilityState.COMPATIBLE
+                        || compatibility.getState() == CompatibilityState.PARTIAL)) {
+                    status = PreconditionStatus.SATISFIED;
+                }
                 if (status == PreconditionStatus.UNKNOWN) {
                     decisions.put(
                         id,
@@ -145,8 +165,32 @@ public final class PatchRegistry {
             String source = request.isExplicitlyEnabled(id)
                 ? "explicitly enabled within profile " + request.getProfile()
                 : "enabled by default in profile " + request.getProfile();
+            if (compatibility != null) {
+                source += "; compatibility=" + compatibility.getState() + " (" + compatibility.getDetail() + ')';
+            }
             decisions.put(id, PatchDecision.enabled(descriptor, source));
             enabled.add(id);
+        }
+    }
+
+    private static CompatibilityDecision evaluateCompatibility(CompatibilityManager manager,
+        PatchDescriptor descriptor) {
+        return manager == null ? null : manager.evaluatePatch(descriptor);
+    }
+
+    private static PatchDecisionReason disabledCompatibilityReason(CompatibilityState state) {
+        switch (state) {
+            case REPLACED:
+                return PatchDecisionReason.COMPATIBILITY_REPLACED;
+            case CONFLICT:
+                return PatchDecisionReason.COMPATIBILITY_CONFLICT;
+            case UNKNOWN:
+                return PatchDecisionReason.COMPATIBILITY_UNKNOWN;
+            case COMPATIBLE:
+            case PARTIAL:
+                return null;
+            default:
+                throw new AssertionError("Unhandled compatibility state: " + state);
         }
     }
 

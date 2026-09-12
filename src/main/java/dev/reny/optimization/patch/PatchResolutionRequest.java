@@ -6,6 +6,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import dev.reny.optimization.compat.CompatibilityManager;
+
 /** Immutable input to one deterministic registry resolution pass. */
 public final class PatchResolutionRequest {
 
@@ -13,6 +15,7 @@ public final class PatchResolutionRequest {
     private final SortedSet<String> explicitlyEnabled;
     private final SortedSet<String> explicitlyDisabled;
     private final SortedMap<String, PreconditionStatus> preconditions;
+    private final CompatibilityManager compatibilityManager;
 
     private PatchResolutionRequest(Builder builder) {
         if (builder.profile == null) {
@@ -29,6 +32,7 @@ public final class PatchResolutionRequest {
         this.explicitlyDisabled = Collections.unmodifiableSortedSet(new TreeSet<String>(builder.explicitlyDisabled));
         this.preconditions = Collections
             .unmodifiableSortedMap(new TreeMap<String, PreconditionStatus>(builder.preconditions));
+        this.compatibilityManager = builder.compatibilityManager;
     }
 
     public static Builder builder(OptimizationProfile profile) {
@@ -51,6 +55,10 @@ public final class PatchResolutionRequest {
         return preconditions;
     }
 
+    public CompatibilityManager getCompatibilityManager() {
+        return compatibilityManager;
+    }
+
     public boolean isExplicitlyEnabled(String id) {
         return explicitlyEnabled.contains(id);
     }
@@ -70,6 +78,7 @@ public final class PatchResolutionRequest {
         private final SortedSet<String> explicitlyEnabled = new TreeSet<String>();
         private final SortedSet<String> explicitlyDisabled = new TreeSet<String>();
         private final SortedMap<String, PreconditionStatus> preconditions = new TreeMap<String, PreconditionStatus>();
+        private CompatibilityManager compatibilityManager;
 
         private Builder(OptimizationProfile profile) {
             this.profile = profile;
@@ -91,6 +100,11 @@ public final class PatchResolutionRequest {
                 throw new IllegalArgumentException("precondition status must not be null");
             }
             preconditions.put(id, status);
+            return this;
+        }
+
+        public Builder compatibilityManager(CompatibilityManager manager) {
+            compatibilityManager = manager;
             return this;
         }
 

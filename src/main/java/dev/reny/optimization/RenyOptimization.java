@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import dev.reny.optimization.compat.CompatibilityManager;
 import dev.reny.optimization.profiler.ForgeProfilerHooks;
 import dev.reny.optimization.profiler.InternalProfiler;
 
@@ -22,8 +23,16 @@ public final class RenyOptimization {
     public static final String MOD_NAME = "Reny Optimization";
     public static final Logger LOG = LogManager.getLogger(MOD_ID);
 
+    private static volatile CompatibilityManager compatibilityManager;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        CompatibilityManager compatibility = CompatibilityManager.detect();
+        compatibilityManager = compatibility;
+        for (String line : compatibility.toDiagnosticLines()) {
+            LOG.info("compatibility: {}", line);
+        }
+
         InternalProfiler profiler = InternalProfiler.get();
         profiler.initialize(new File(event.getModConfigurationDirectory(), "reny-profiler"));
         FMLCommonHandler.instance()
@@ -34,5 +43,9 @@ public final class RenyOptimization {
             Tags.VERSION,
             profiler.getConfig()
                 .isEnabled());
+    }
+
+    public static CompatibilityManager getCompatibilityManager() {
+        return compatibilityManager;
     }
 }
