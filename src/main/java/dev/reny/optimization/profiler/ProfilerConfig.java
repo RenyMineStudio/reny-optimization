@@ -10,7 +10,8 @@ public final class ProfilerConfig {
         enabled = Boolean.parseBoolean(System.getProperty("reny.profiler.enabled", "true"));
         long mask = 0L;
         for (ProfilerGroup group : ProfilerGroup.values()) {
-            String property = "reny.profiler.group." + group.name().toLowerCase();
+            String property = "reny.profiler.group." + group.name()
+                .toLowerCase();
             if (Boolean.parseBoolean(System.getProperty(property, "true"))) {
                 mask |= bit(group);
             }

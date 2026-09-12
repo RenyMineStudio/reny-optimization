@@ -22,7 +22,8 @@ public final class ProfilerOverheadBenchmark {
     }
 
     private static long runDisabled(InternalProfiler profiler, int iterations) {
-        profiler.getConfig().setEnabled(false);
+        profiler.getConfig()
+            .setEnabled(false);
         long start = System.nanoTime();
         for (int i = 0; i < iterations; i++) {
             long token = profiler.startSection(ProfilerSection.CHUNK);
@@ -32,8 +33,10 @@ public final class ProfilerOverheadBenchmark {
     }
 
     private static long runEnabled(InternalProfiler profiler, int iterations) {
-        profiler.getConfig().setEnabled(true);
-        profiler.getConfig().setGroupEnabled(ProfilerGroup.CHUNK, true);
+        profiler.getConfig()
+            .setEnabled(true);
+        profiler.getConfig()
+            .setGroupEnabled(ProfilerGroup.CHUNK, true);
         long start = System.nanoTime();
         for (int i = 0; i < iterations; i++) {
             long token = profiler.startSection(ProfilerSection.CHUNK);

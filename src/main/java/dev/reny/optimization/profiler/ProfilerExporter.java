@@ -30,8 +30,10 @@ public final class ProfilerExporter {
     private static void writeSummary(ProfilerSnapshot snapshot, File file) throws IOException {
         PrintWriter out = writer(file);
         try {
-            DurationStatistics frameStats = snapshot.getFrames().getStatistics();
-            DurationStatistics tickStats = snapshot.getTicks().getStatistics();
+            DurationStatistics frameStats = snapshot.getFrames()
+                .getStatistics();
+            DurationStatistics tickStats = snapshot.getTicks()
+                .getStatistics();
             ProfilerSnapshot.RuntimeSnapshot runtime = snapshot.getRuntime();
             out.println("{");
             out.println("  \"created_at_ms\": " + snapshot.getCreatedAtMillis() + ',');
@@ -86,7 +88,8 @@ public final class ProfilerExporter {
             for (int i = 0; i < series.size(); i++) {
                 long durationNanos = series.getDurationNanos(i);
                 out.println(
-                    series.getId(i) + "," + series.getCorrelationId(i) + "," + durationNanos + "," + millis(durationNanos));
+                    series.getId(
+                        i) + "," + series.getCorrelationId(i) + "," + durationNanos + "," + millis(durationNanos));
             }
         } finally {
             out.close();
@@ -99,8 +102,17 @@ public final class ProfilerExporter {
             out.println("section,call_count,total_ns,max_ns,total_ms,max_ms");
             for (ProfilerSnapshot.SectionSnapshot section : snapshot.getSections()) {
                 out.println(
-                    section.getSection().name() + "," + section.getCallCount() + "," + section.getTotalNanos() + ","
-                        + section.getMaxNanos() + "," + millis(section.getTotalNanos()) + "," + millis(section.getMaxNanos()));
+                    section.getSection()
+                        .name() + ","
+                        + section.getCallCount()
+                        + ","
+                        + section.getTotalNanos()
+                        + ","
+                        + section.getMaxNanos()
+                        + ","
+                        + millis(section.getTotalNanos())
+                        + ","
+                        + millis(section.getMaxNanos()));
             }
         } finally {
             out.close();

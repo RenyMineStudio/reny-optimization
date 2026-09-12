@@ -26,10 +26,13 @@ public final class RenyOptimization {
     public void preInit(FMLPreInitializationEvent event) {
         InternalProfiler profiler = InternalProfiler.get();
         profiler.initialize(new File(event.getModConfigurationDirectory(), "reny-profiler"));
-        FMLCommonHandler.instance().bus().register(ForgeProfilerHooks.INSTANCE);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(ForgeProfilerHooks.INSTANCE);
         LOG.info(
             "Reny Optimization {} initialized; internal profiler enabled={}, no optimization patches active",
             Tags.VERSION,
-            profiler.getConfig().isEnabled());
+            profiler.getConfig()
+                .isEnabled());
     }
 }

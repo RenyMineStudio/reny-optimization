@@ -52,8 +52,16 @@ public final class InternalProfilerSelfTest {
         profiler.recordTickDurationNanos(7L, 20L, 4_000_000L);
         profiler.recordFrameDurationNanos(21L, 7L, 8_000_000L);
         ProfilerSnapshot snapshot = profiler.snapshot();
-        equal(7L, snapshot.getFrames().getCorrelationId(0), "frame -> tick correlation");
-        equal(20L, snapshot.getTicks().getCorrelationId(0), "tick -> frame correlation");
+        equal(
+            7L,
+            snapshot.getFrames()
+                .getCorrelationId(0),
+            "frame -> tick correlation");
+        equal(
+            20L,
+            snapshot.getTicks()
+                .getCorrelationId(0),
+            "tick -> frame correlation");
         pass();
     }
 
@@ -71,10 +79,13 @@ public final class InternalProfilerSelfTest {
 
     private void testDisablePaths() {
         InternalProfiler profiler = new InternalProfiler(8, 8);
-        profiler.getConfig().setEnabled(false);
+        profiler.getConfig()
+            .setEnabled(false);
         equal(InternalProfiler.DISABLED_TOKEN, profiler.beginFrame(), "global disable");
-        profiler.getConfig().setEnabled(true);
-        profiler.getConfig().setGroupEnabled(ProfilerGroup.TICK, false);
+        profiler.getConfig()
+            .setEnabled(true);
+        profiler.getConfig()
+            .setGroupEnabled(ProfilerGroup.TICK, false);
         equal(InternalProfiler.DISABLED_TOKEN, profiler.beginTick(), "group disable");
         pass();
     }
@@ -89,9 +100,21 @@ public final class InternalProfilerSelfTest {
         profiler.taskCompleted();
         ProfilerSnapshot snapshot = profiler.snapshot();
         equal(1L, snapshot.getSections()[ProfilerSection.CHUNK.ordinal()].getCallCount(), "section calls");
-        equal(5L, snapshot.getRuntime().getQueuedTasks(), "queued tasks");
-        equal(2L, snapshot.getRuntime().getActiveTasks(), "active tasks");
-        equal(1L, snapshot.getRuntime().getSubmittedTasks(), "submitted tasks");
+        equal(
+            5L,
+            snapshot.getRuntime()
+                .getQueuedTasks(),
+            "queued tasks");
+        equal(
+            2L,
+            snapshot.getRuntime()
+                .getActiveTasks(),
+            "active tasks");
+        equal(
+            1L,
+            snapshot.getRuntime()
+                .getSubmittedTasks(),
+            "submitted tasks");
         pass();
     }
 
@@ -99,7 +122,8 @@ public final class InternalProfilerSelfTest {
         InternalProfiler profiler = new InternalProfiler(8, 8);
         profiler.recordFrameDurationNanos(9L, 4L, 12_000_000L);
         profiler.recordTickDurationNanos(4L, 9L, 6_000_000L);
-        File root = Files.createTempDirectory("reny-profiler-test").toFile();
+        File root = Files.createTempDirectory("reny-profiler-test")
+            .toFile();
         File output = profiler.exportNow(root);
         File summary = new File(output, "summary.json");
         File frames = new File(output, "frames.csv");

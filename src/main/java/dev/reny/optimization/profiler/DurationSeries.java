@@ -3,7 +3,9 @@ package dev.reny.optimization.profiler;
 /**
  * Single-writer fixed-size ring buffer for duration samples.
  *
- * <p>Recording allocates nothing. Snapshots allocate and may retry if a writer publishes while data is copied.</p>
+ * <p>
+ * Recording allocates nothing. Snapshots allocate and may retry if a writer publishes while data is copied.
+ * </p>
  */
 final class DurationSeries {
 

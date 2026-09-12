@@ -27,7 +27,9 @@ public final class ForgeProfilerHooks {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (!FMLCommonHandler.instance().getSide().isClient()) {
+        if (!FMLCommonHandler.instance()
+            .getSide()
+            .isClient()) {
             return;
         }
         handleTickPhase(event.phase);
@@ -35,7 +37,9 @@ public final class ForgeProfilerHooks {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (!FMLCommonHandler.instance().getSide().isServer()) {
+        if (!FMLCommonHandler.instance()
+            .getSide()
+            .isServer()) {
             return;
         }
         handleTickPhase(event.phase);

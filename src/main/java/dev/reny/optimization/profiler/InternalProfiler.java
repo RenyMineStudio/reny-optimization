@@ -12,13 +12,8 @@ import java.util.concurrent.atomic.LongAdder;
 public final class InternalProfiler {
 
     public static final long DISABLED_TOKEN = Long.MIN_VALUE;
-    public static final long[] FRAME_THRESHOLDS_NANOS = {
-        16_670_000L,
-        33_330_000L,
-        50_000_000L,
-        100_000_000L,
-        250_000_000L
-    };
+    public static final long[] FRAME_THRESHOLDS_NANOS = { 16_670_000L, 33_330_000L, 50_000_000L, 100_000_000L,
+        250_000_000L };
 
     private static final InternalProfiler INSTANCE = new InternalProfiler(8192, 2048);
 
@@ -142,8 +137,8 @@ public final class InternalProfiler {
     }
 
     public ProfilerSnapshot snapshot() {
-        ProfilerSnapshot.SectionSnapshot[] sectionSnapshots =
-            new ProfilerSnapshot.SectionSnapshot[ProfilerSection.values().length];
+        ProfilerSnapshot.SectionSnapshot[] sectionSnapshots = new ProfilerSnapshot.SectionSnapshot[ProfilerSection
+            .values().length];
         for (ProfilerSection section : ProfilerSection.values()) {
             SectionAccumulator accumulator = sections[section.ordinal()];
             sectionSnapshots[section.ordinal()] = new ProfilerSnapshot.SectionSnapshot(
@@ -196,7 +191,8 @@ public final class InternalProfiler {
     }
 
     private ProfilerSnapshot.RuntimeSnapshot captureRuntime() {
-        MemoryUsage heap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        MemoryUsage heap = ManagementFactory.getMemoryMXBean()
+            .getHeapMemoryUsage();
         long gcCount = 0L;
         long gcTimeMillis = 0L;
         List<GarbageCollectorMXBean> collectors = ManagementFactory.getGarbageCollectorMXBeans();
@@ -229,21 +225,22 @@ public final class InternalProfiler {
             if (shutdownHookInstalled) {
                 return;
             }
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            Runtime.getRuntime()
+                .addShutdownHook(new Thread(new Runnable() {
 
-                @Override
-                public void run() {
-                    File directory = automaticExportDirectory;
-                    if (directory == null || !config.isEnabled()) {
-                        return;
+                    @Override
+                    public void run() {
+                        File directory = automaticExportDirectory;
+                        if (directory == null || !config.isEnabled()) {
+                            return;
+                        }
+                        try {
+                            exportNow(directory);
+                        } catch (RuntimeException ignored) {
+                            // Shutdown export is best effort; never prevent JVM termination.
+                        }
                     }
-                    try {
-                        exportNow(directory);
-                    } catch (RuntimeException ignored) {
-                        // Shutdown export is best effort; never prevent JVM termination.
-                    }
-                }
-            }, "reny-profiler-export"));
+                }, "reny-profiler-export"));
             shutdownHookInstalled = true;
         }
     }
