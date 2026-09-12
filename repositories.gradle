@@ -1,0 +1,3 @@
+repositories {
+    // Extra repositories belong here. The GTNH convention already configures its required repositories.
+}
