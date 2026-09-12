@@ -1,10 +1,9 @@
 package dev.reny.optimization.profiler;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
-/** Initial Forge/FML hooks for frame and physical-side tick timing. */
+/** Initial Forge/FML hooks for client frame timing and server simulation MSPT. */
 public final class ForgeProfilerHooks {
 
     public static final ForgeProfilerHooks INSTANCE = new ForgeProfilerHooks();
@@ -26,27 +25,8 @@ public final class ForgeProfilerHooks {
     }
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (!FMLCommonHandler.instance()
-            .getSide()
-            .isClient()) {
-            return;
-        }
-        handleTickPhase(event.phase);
-    }
-
-    @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (!FMLCommonHandler.instance()
-            .getSide()
-            .isServer()) {
-            return;
-        }
-        handleTickPhase(event.phase);
-    }
-
-    private void handleTickPhase(TickEvent.Phase phase) {
-        if (phase == TickEvent.Phase.START) {
+        if (event.phase == TickEvent.Phase.START) {
             tickStart = profiler.beginTick();
         } else {
             profiler.endTick(tickStart);
