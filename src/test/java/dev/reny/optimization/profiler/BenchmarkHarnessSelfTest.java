@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import dev.reny.optimization.benchmark.BenchmarkClock;
 import dev.reny.optimization.benchmark.BenchmarkContext;
 import dev.reny.optimization.benchmark.BenchmarkScenario;
 import dev.reny.optimization.benchmark.BenchmarkSession;
@@ -24,7 +25,7 @@ public final class BenchmarkHarnessSelfTest {
         testMeasuredStatistics();
         testWarmupIsolationAndExport();
         testRepeatedRunsDoNotOverwrite();
-        testStateValidation();
+        testStateAndDurationValidation();
         System.out.println("BenchmarkHarnessSelfTest: " + passed + " tests passed");
     }
 
@@ -52,28 +53,35 @@ public final class BenchmarkHarnessSelfTest {
 
     private void testWarmupIsolationAndExport() throws Exception {
         InternalProfiler profiler = new InternalProfiler(32, 32);
+        ManualClock clock = new ManualClock(1_000L);
         File root = Files.createTempDirectory("reny-benchmark-warmup")
             .toFile();
         BenchmarkSession session = new BenchmarkSession(
             profiler,
             BenchmarkScenario.STATIONARY_RENDER,
             context(),
-            0L,
-            1L,
-            root);
+            1_000L,
+            2_000L,
+            root,
+            clock);
 
         session.startWarmup();
         long warmupFrame = profiler.beginFrame();
         profiler.endFrame(warmupFrame);
         long warmupTick = profiler.beginTick();
         profiler.endTick(warmupTick);
-        check(session.shouldBeginMeasurement(), "zero-duration warmup should be ready");
+        check(!session.shouldBeginMeasurement(), "warmup must not finish early");
+        clock.advanceMillis(1_000L);
+        check(session.shouldBeginMeasurement(), "configured warmup should become ready");
         session.beginMeasurement();
 
         long measuredFrameId = profiler.getCurrentFrameId() + 1L;
         long measuredTickId = profiler.getCurrentTickId() + 1L;
         profiler.recordFrameDurationNanos(measuredFrameId, measuredTickId, 20_000_000L);
         profiler.recordTickDurationNanos(measuredTickId, measuredFrameId, 30_000_000L);
+        check(!session.shouldFinishMeasurement(), "measurement must not finish early");
+        clock.advanceMillis(2_000L);
+        check(session.shouldFinishMeasurement(), "configured measurement should become ready");
 
         File output = session.finish();
         File environment = new File(output, "environment.json");
@@ -91,6 +99,8 @@ public final class BenchmarkHarnessSelfTest {
         check(tickText.contains(measuredTickId + "," + measuredFrameId + ",30000000"), "measured tick exported");
         check(summaryText.contains("\"sample_count\": 1"), "summary uses measured window");
         check(summaryText.contains("\"schema_version\": 1"), "summary schema version");
+        check(summaryText.contains("\"actual_ms\": 1000.0"), "actual warmup persisted");
+        check(summaryText.contains("\"actual_ms\": 2000.0"), "actual measurement persisted");
         check(environmentText.contains("\"commit_sha\": \"test-commit\""), "commit SHA persisted");
         check(environmentText.contains("\"vsync\": false"), "VSync persisted");
         pass();
@@ -98,6 +108,7 @@ public final class BenchmarkHarnessSelfTest {
 
     private void testRepeatedRunsDoNotOverwrite() throws Exception {
         InternalProfiler profiler = new InternalProfiler(8, 8);
+        ManualClock clock = new ManualClock(5_000L);
         File root = Files.createTempDirectory("reny-benchmark-unique")
             .toFile();
         BenchmarkSession first = new BenchmarkSession(
@@ -106,9 +117,11 @@ public final class BenchmarkHarnessSelfTest {
             context(),
             0L,
             1L,
-            root);
+            root,
+            clock);
         first.startWarmup();
         first.beginMeasurement();
+        clock.advanceMillis(1L);
         File firstOutput = first.finish();
 
         BenchmarkSession second = new BenchmarkSession(
@@ -117,9 +130,11 @@ public final class BenchmarkHarnessSelfTest {
             context(),
             0L,
             1L,
-            root);
+            root,
+            clock);
         second.startWarmup();
         second.beginMeasurement();
+        clock.advanceMillis(1L);
         File secondOutput = second.finish();
 
         check(!first.getRunId().equals(second.getRunId()), "run IDs must be unique");
@@ -128,22 +143,44 @@ public final class BenchmarkHarnessSelfTest {
         pass();
     }
 
-    private void testStateValidation() throws Exception {
+    private void testStateAndDurationValidation() throws Exception {
+        ManualClock clock = new ManualClock(10_000L);
         BenchmarkSession session = new BenchmarkSession(
             new InternalProfiler(8, 8),
             BenchmarkScenario.LIGHTING_TORTURE,
             context(),
-            0L,
-            1L,
+            10L,
+            20L,
             Files.createTempDirectory("reny-benchmark-state")
-                .toFile());
-        boolean failed = false;
+                .toFile(),
+            clock);
+
+        boolean wrongState = false;
         try {
             session.beginMeasurement();
         } catch (IllegalStateException expected) {
-            failed = true;
+            wrongState = true;
         }
-        check(failed, "measurement cannot begin before warmup");
+        check(wrongState, "measurement cannot begin before warmup");
+
+        session.startWarmup();
+        boolean earlyWarmup = false;
+        try {
+            session.beginMeasurement();
+        } catch (IllegalStateException expected) {
+            earlyWarmup = true;
+        }
+        check(earlyWarmup, "configured warmup duration must be enforced");
+
+        clock.advanceMillis(10L);
+        session.beginMeasurement();
+        boolean earlyMeasurement = false;
+        try {
+            session.finish();
+        } catch (IllegalStateException expected) {
+            earlyMeasurement = true;
+        }
+        check(earlyMeasurement, "configured measurement duration must be enforced");
         pass();
     }
 
@@ -173,6 +210,32 @@ public final class BenchmarkHarnessSelfTest {
     private static void check(boolean condition, String message) {
         if (!condition) {
             throw new AssertionError(message);
+        }
+    }
+
+    private static final class ManualClock implements BenchmarkClock {
+
+        private long nanos;
+        private long millis;
+
+        private ManualClock(long initialMillis) {
+            millis = initialMillis;
+            nanos = initialMillis * 1_000_000L;
+        }
+
+        @Override
+        public long nanoTime() {
+            return nanos;
+        }
+
+        @Override
+        public long currentTimeMillis() {
+            return millis;
+        }
+
+        private void advanceMillis(long amount) {
+            millis += amount;
+            nanos += amount * 1_000_000L;
         }
     }
 }
