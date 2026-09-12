@@ -42,6 +42,13 @@ jobs:
           grep -q 'runServer' build/task-list.txt
           grep -q 'setupDecompWorkspace' build/task-list.txt
 
+      - name: Verify UniMixins runtime dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew dependencies --configuration runtimeClasspath > build/runtime-dependencies.txt
+          grep -qi 'unimixins' build/runtime-dependencies.txt
+
       - name: Verify packaged mod
         shell: bash
         run: |
