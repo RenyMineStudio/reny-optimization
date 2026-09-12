@@ -9,6 +9,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dev.reny.optimization.compat.CompatibilityManager;
+import dev.reny.optimization.compat.EnvironmentDetector;
 import dev.reny.optimization.profiler.ForgeProfilerHooks;
 import dev.reny.optimization.profiler.InternalProfiler;
 
@@ -27,7 +28,7 @@ public final class RenyOptimization {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        CompatibilityManager compatibility = CompatibilityManager.detect();
+        CompatibilityManager compatibility = new CompatibilityManager(EnvironmentDetector.capture());
         compatibilityManager = compatibility;
         for (String line : compatibility.toDiagnosticLines()) {
             LOG.info("compatibility: {}", line);

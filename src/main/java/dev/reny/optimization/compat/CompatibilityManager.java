@@ -32,10 +32,6 @@ public final class CompatibilityManager {
         this.environment = environment;
     }
 
-    public static CompatibilityManager detect() {
-        return new CompatibilityManager(EnvironmentDetector.capture());
-    }
-
     public EnvironmentSnapshot getEnvironment() {
         return environment;
     }

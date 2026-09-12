@@ -59,14 +59,17 @@ Feature tags express duplicate/overlapping functionality without naming third-pa
 
 ## Registry and diagnostics
 
-Supply the manager to a resolution request:
+Create the manager from the Forge-specific detector, then supply it to a resolution request:
 
 ```java
+CompatibilityManager compatibility = new CompatibilityManager(EnvironmentDetector.capture());
 PatchSnapshot snapshot = registry.resolve(
     PatchResolutionRequest.builder(OptimizationProfile.AGGRESSIVE)
-        .compatibilityManager(CompatibilityManager.detect())
+        .compatibilityManager(compatibility)
         .build());
 ```
+
+The policy/model classes deliberately do not depend on Forge. Only `EnvironmentDetector` imports FML classes, so the patch-registry core can still be compiled and tested directly on plain Java 8.
 
 Disabled patches use stable reasons:
 
