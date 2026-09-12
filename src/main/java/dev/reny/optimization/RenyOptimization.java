@@ -1,10 +1,15 @@
 package dev.reny.optimization;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import dev.reny.optimization.profiler.ForgeProfilerHooks;
+import dev.reny.optimization.profiler.InternalProfiler;
 
 @Mod(
     modid = RenyOptimization.MOD_ID,
@@ -19,6 +24,12 @@ public final class RenyOptimization {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        LOG.info("Reny Optimization {} initialized with no optimization patches active", Tags.VERSION);
+        InternalProfiler profiler = InternalProfiler.get();
+        profiler.initialize(new File(event.getModConfigurationDirectory(), "reny-profiler"));
+        FMLCommonHandler.instance().bus().register(ForgeProfilerHooks.INSTANCE);
+        LOG.info(
+            "Reny Optimization {} initialized; internal profiler enabled={}, no optimization patches active",
+            Tags.VERSION,
+            profiler.getConfig().isEnabled());
     }
 }
