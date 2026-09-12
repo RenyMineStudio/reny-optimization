@@ -1,21 +1,17 @@
-name: Profiler Format
+name: Internal Profiler
 
 on:
+  pull_request:
+    branches: [ main ]
   push:
-    branches: [ issue-4-internal-profiler ]
-
-permissions:
-  contents: write
+    branches: [ main ]
 
 jobs:
-  format:
-    if: github.actor != 'github-actions[bot]'
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Gradle runtime JDK
         uses: actions/setup-java@v5
@@ -26,17 +22,5 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Apply formatter
-        run: ./gradlew spotlessApply --stacktrace
-
-      - name: Commit formatter output
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src
-          if ! git diff --cached --quiet; then
-            git commit -m 'style: apply profiler formatting'
-            git push origin HEAD:issue-4-internal-profiler
-          fi
+      - name: Run profiler self-test
+        run: ./gradlew profilerSelfTest --stacktrace
