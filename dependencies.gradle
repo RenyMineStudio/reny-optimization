@@ -1,0 +1,4 @@
+dependencies {
+    // UniMixins is supplied automatically by the GTNH convention when usesMixins=true.
+    // Add future compile/runtime dependencies here rather than bloating build.gradle.kts.
+}
