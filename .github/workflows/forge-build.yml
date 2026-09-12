@@ -1,0 +1,52 @@
+name: Forge Build
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Gradle runtime JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and reobfuscate
+        run: ./gradlew build --stacktrace
+
+      - name: Verify Java 8 bytecode
+        shell: bash
+        run: |
+          set -euo pipefail
+          class_file="build/classes/java/main/dev/reny/optimization/RenyOptimization.class"
+          test -f "$class_file"
+          javap -verbose "$class_file" | grep -q 'major version: 52'
+
+      - name: Verify development tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew tasks --all > build/task-list.txt
+          grep -q 'runClient' build/task-list.txt
+          grep -q 'runServer' build/task-list.txt
+          grep -q 'setupDecompWorkspace' build/task-list.txt
+
+      - name: Verify packaged mod
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar_file="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' | head -n 1)"
+          test -n "$jar_file"
+          jar tf "$jar_file" | grep -q '^mcmod.info$'
+          jar tf "$jar_file" | grep -q '^dev/reny/optimization/RenyOptimization.class$'
