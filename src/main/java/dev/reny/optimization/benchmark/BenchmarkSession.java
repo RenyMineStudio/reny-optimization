@@ -40,7 +40,7 @@ public final class BenchmarkSession {
             SystemClock.INSTANCE);
     }
 
-    BenchmarkSession(InternalProfiler profiler, BenchmarkScenario scenario, BenchmarkContext context,
+    public BenchmarkSession(InternalProfiler profiler, BenchmarkScenario scenario, BenchmarkContext context,
         long configuredWarmupMillis, long configuredMeasurementMillis, File outputRoot, BenchmarkClock clock) {
         if (profiler == null || scenario == null || context == null || outputRoot == null || clock == null) {
             throw new IllegalArgumentException("benchmark arguments must not be null");
@@ -71,6 +71,9 @@ public final class BenchmarkSession {
 
     public void beginMeasurement() {
         require(State.WARMUP);
+        if (!shouldBeginMeasurement()) {
+            throw new IllegalStateException("Configured benchmark warmup has not completed");
+        }
         ProfilerSnapshot boundary = profiler.snapshot();
         frameCutoffId = boundary.getCurrentFrameId();
         tickCutoffId = boundary.getCurrentTickId();
@@ -87,6 +90,9 @@ public final class BenchmarkSession {
 
     public File finish() {
         require(State.MEASURING);
+        if (!shouldFinishMeasurement()) {
+            throw new IllegalStateException("Configured benchmark measurement window has not completed");
+        }
         long completedNanos = clock.nanoTime();
         long completedAtMillis = clock.currentTimeMillis();
         ProfilerSnapshot end = profiler.snapshot();
