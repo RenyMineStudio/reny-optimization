@@ -4,7 +4,8 @@ package dev.reny.optimization.profiler;
  * Single-writer fixed-size ring buffer for duration samples.
  *
  * <p>
- * Recording allocates nothing. Snapshots allocate and may retry if a writer publishes while data is copied.
+ * Recording allocates nothing. Snapshots allocate and retry when a writer is publishing or changes the window while
+ * data is copied.
  * </p>
  */
 final class DurationSeries {
@@ -27,6 +28,9 @@ final class DurationSeries {
     }
 
     void record(long id, long correlationId, long durationNanos) {
+        long writingVersion = publishedVersion + 1L;
+        publishedVersion = writingVersion;
+
         int index = cursor;
         ids[index] = id;
         correlationIds[index] = correlationId;
@@ -36,22 +40,42 @@ final class DurationSeries {
             size++;
         }
         totalSamples++;
-        publishedVersion = totalSamples;
+
+        publishedVersion = writingVersion + 1L;
     }
 
     DurationSeriesSnapshot snapshot() {
         for (int attempt = 0; attempt < 3; attempt++) {
             long before = publishedVersion;
+            if ((before & 1L) != 0L) {
+                continue;
+            }
+
             int localCursor = cursor;
             int localSize = size;
             long localTotalSamples = totalSamples;
             DurationSeriesSnapshot snapshot = copy(localCursor, localSize, localTotalSamples);
-            if (before == publishedVersion) {
+            long after = publishedVersion;
+            if (before == after && (after & 1L) == 0L) {
                 return snapshot;
             }
         }
 
-        return copy(cursor, size, totalSamples);
+        while (true) {
+            long before = publishedVersion;
+            if ((before & 1L) != 0L) {
+                Thread.yield();
+                continue;
+            }
+            int localCursor = cursor;
+            int localSize = size;
+            long localTotalSamples = totalSamples;
+            DurationSeriesSnapshot snapshot = copy(localCursor, localSize, localTotalSamples);
+            long after = publishedVersion;
+            if (before == after && (after & 1L) == 0L) {
+                return snapshot;
+            }
+        }
     }
 
     private DurationSeriesSnapshot copy(int localCursor, int localSize, long localTotalSamples) {
