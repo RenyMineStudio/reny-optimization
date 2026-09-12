@@ -23,7 +23,8 @@ public final class PatchSnapshot {
 
         TreeSet<String> enabled = new TreeSet<String>();
         for (Map.Entry<String, PatchDecision> entry : ordered.entrySet()) {
-            if (entry.getValue().isEnabled()) {
+            if (entry.getValue()
+                .isEnabled()) {
                 enabled.add(entry.getKey());
             }
         }

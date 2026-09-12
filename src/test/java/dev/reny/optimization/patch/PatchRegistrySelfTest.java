@@ -30,8 +30,7 @@ public final class PatchRegistrySelfTest {
     }
 
     private void testCompatibleProfileOnlyAllowsSafePatches() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("memory.safe", PatchRisk.SAFE).build())
+        PatchRegistry registry = new PatchRegistry().register(patch("memory.safe", PatchRisk.SAFE).build())
             .register(patch("tick.aggressive", PatchRisk.AGGRESSIVE).build())
             .register(patch("world.experimental", PatchRisk.EXPERIMENTAL).build())
             .register(patch("render.nuclear", PatchRisk.NUCLEAR).build());
@@ -46,27 +45,25 @@ public final class PatchRegistrySelfTest {
     }
 
     private void testUnsafePatchFailsClosedWithoutPreconditionProof() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("tick.fast", PatchRisk.AGGRESSIVE).build());
+        PatchRegistry registry = new PatchRegistry().register(patch("tick.fast", PatchRisk.AGGRESSIVE).build());
 
         PatchSnapshot unknown = registry.resolve(request(OptimizationProfile.AGGRESSIVE).build());
         assertReason(unknown, "tick.fast", PatchDecisionReason.PRECONDITION_UNKNOWN);
 
         PatchSnapshot satisfied = registry.resolve(
-            request(OptimizationProfile.AGGRESSIVE)
-                .precondition("tick.fast", PreconditionStatus.SATISFIED)
+            request(OptimizationProfile.AGGRESSIVE).precondition("tick.fast", PreconditionStatus.SATISFIED)
                 .build());
         assertEnabled(satisfied, "tick.fast");
         pass();
     }
 
     private void testProfileIsHardCeilingEvenForExplicitEnable() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("render.rewrite", PatchRisk.NUCLEAR).defaultEnabled(false).build());
+        PatchRegistry registry = new PatchRegistry().register(
+            patch("render.rewrite", PatchRisk.NUCLEAR).defaultEnabled(false)
+                .build());
 
         PatchSnapshot snapshot = registry.resolve(
-            request(OptimizationProfile.COMPATIBLE)
-                .enable("render.rewrite")
+            request(OptimizationProfile.COMPATIBLE).enable("render.rewrite")
                 .precondition("render.rewrite", PreconditionStatus.SATISFIED)
                 .build());
 
@@ -75,36 +72,43 @@ public final class PatchRegistrySelfTest {
     }
 
     private void testExplicitEnableActivatesOptInPatch() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("memory.opt_in", PatchRisk.SAFE).defaultEnabled(false).build());
+        PatchRegistry registry = new PatchRegistry().register(
+            patch("memory.opt_in", PatchRisk.SAFE).defaultEnabled(false)
+                .build());
 
         PatchSnapshot defaultSnapshot = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
         assertReason(defaultSnapshot, "memory.opt_in", PatchDecisionReason.NOT_DEFAULT_ENABLED);
 
         PatchSnapshot enabledSnapshot = registry.resolve(
-            request(OptimizationProfile.COMPATIBLE).enable("memory.opt_in").build());
+            request(OptimizationProfile.COMPATIBLE).enable("memory.opt_in")
+                .build());
         assertEnabled(enabledSnapshot, "memory.opt_in");
         pass();
     }
 
     private void testDependenciesResolveAndPropagateDisablement() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("core.base", PatchRisk.SAFE).defaultEnabled(false).build())
-            .register(patch("world.child", PatchRisk.SAFE).requires("core.base").build());
+        PatchRegistry registry = new PatchRegistry().register(
+            patch("core.base", PatchRisk.SAFE).defaultEnabled(false)
+                .build())
+            .register(
+                patch("world.child", PatchRisk.SAFE).requires("core.base")
+                    .build());
 
         PatchSnapshot withoutBase = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
         assertReason(withoutBase, "world.child", PatchDecisionReason.DISABLED_DEPENDENCY);
 
         PatchSnapshot withBase = registry.resolve(
-            request(OptimizationProfile.COMPATIBLE).enable("core.base").build());
+            request(OptimizationProfile.COMPATIBLE).enable("core.base")
+                .build());
         assertEnabled(withBase, "core.base");
         assertEnabled(withBase, "world.child");
         pass();
     }
 
     private void testMissingDependencyFailsClosed() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("world.child", PatchRisk.SAFE).requires("core.not_registered").build());
+        PatchRegistry registry = new PatchRegistry().register(
+            patch("world.child", PatchRisk.SAFE).requires("core.not_registered")
+                .build());
 
         PatchSnapshot snapshot = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
         assertReason(snapshot, "world.child", PatchDecisionReason.MISSING_DEPENDENCY);
@@ -113,8 +117,12 @@ public final class PatchRegistrySelfTest {
 
     private void testDependencyCycleFailsClosed() {
         PatchRegistry registry = new PatchRegistry()
-            .register(patch("cycle.alpha", PatchRisk.SAFE).requires("cycle.beta").build())
-            .register(patch("cycle.beta", PatchRisk.SAFE).requires("cycle.alpha").build());
+            .register(
+                patch("cycle.alpha", PatchRisk.SAFE).requires("cycle.beta")
+                    .build())
+            .register(
+                patch("cycle.beta", PatchRisk.SAFE).requires("cycle.alpha")
+                    .build());
 
         PatchSnapshot snapshot = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
         assertReason(snapshot, "cycle.alpha", PatchDecisionReason.DEPENDENCY_CYCLE);
@@ -124,8 +132,12 @@ public final class PatchRegistrySelfTest {
 
     private void testConflictsResolveDeterministically() {
         PatchRegistry registry = new PatchRegistry()
-            .register(patch("memory.alpha", PatchRisk.SAFE).conflictsWith("memory.beta").build())
-            .register(patch("memory.beta", PatchRisk.SAFE).conflictsWith("memory.alpha").build());
+            .register(
+                patch("memory.alpha", PatchRisk.SAFE).conflictsWith("memory.beta")
+                    .build())
+            .register(
+                patch("memory.beta", PatchRisk.SAFE).conflictsWith("memory.alpha")
+                    .build());
 
         PatchSnapshot snapshot = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
         assertEnabled(snapshot, "memory.alpha");
@@ -135,11 +147,16 @@ public final class PatchRegistrySelfTest {
 
     private void testExplicitEnableWinsConflictPriority() {
         PatchRegistry registry = new PatchRegistry()
-            .register(patch("memory.alpha", PatchRisk.SAFE).conflictsWith("memory.beta").build())
-            .register(patch("memory.beta", PatchRisk.SAFE).conflictsWith("memory.alpha").build());
+            .register(
+                patch("memory.alpha", PatchRisk.SAFE).conflictsWith("memory.beta")
+                    .build())
+            .register(
+                patch("memory.beta", PatchRisk.SAFE).conflictsWith("memory.alpha")
+                    .build());
 
         PatchSnapshot snapshot = registry.resolve(
-            request(OptimizationProfile.COMPATIBLE).enable("memory.beta").build());
+            request(OptimizationProfile.COMPATIBLE).enable("memory.beta")
+                .build());
         assertEnabled(snapshot, "memory.beta");
         assertReason(snapshot, "memory.alpha", PatchDecisionReason.CONFLICT);
         pass();
@@ -148,6 +165,7 @@ public final class PatchRegistrySelfTest {
     private void testDuplicateIdsAreRejected() {
         PatchRegistry registry = new PatchRegistry().register(patch("memory.same", PatchRisk.SAFE).build());
         expectIllegalArgument(new ThrowingAction() {
+
             @Override
             public void run() {
                 registry.register(patch("memory.same", PatchRisk.SAFE).build());
@@ -159,28 +177,42 @@ public final class PatchRegistrySelfTest {
     private void testUnknownConfigReferenceIsRejected() {
         final PatchRegistry registry = new PatchRegistry().register(patch("memory.known", PatchRisk.SAFE).build());
         expectIllegalArgument(new ThrowingAction() {
+
             @Override
             public void run() {
-                registry.resolve(request(OptimizationProfile.COMPATIBLE).enable("memory.unknown").build());
+                registry.resolve(
+                    request(OptimizationProfile.COMPATIBLE).enable("memory.unknown")
+                        .build());
             }
         });
         pass();
     }
 
     private void testDiagnosticSnapshotIsStable() {
-        PatchRegistry registry = new PatchRegistry()
-            .register(patch("z.patch", PatchRisk.SAFE).build())
-            .register(patch("a.patch", PatchRisk.SAFE).defaultEnabled(false).build());
+        PatchRegistry registry = new PatchRegistry().register(patch("z.patch", PatchRisk.SAFE).build())
+            .register(
+                patch("a.patch", PatchRisk.SAFE).defaultEnabled(false)
+                    .build());
 
         PatchSnapshot snapshot = registry.resolve(request(OptimizationProfile.COMPATIBLE).build());
-        assertEquals("profile=COMPATIBLE enabled=1 disabled=1", snapshot.toDiagnosticLines().get(0));
-        assertTrue(snapshot.toDiagnosticLines().get(1).startsWith("[DISABLED:NOT_DEFAULT_ENABLED] a.patch"));
-        assertTrue(snapshot.toDiagnosticLines().get(2).startsWith("[ENABLED] z.patch"));
+        assertEquals(
+            "profile=COMPATIBLE enabled=1 disabled=1",
+            snapshot.toDiagnosticLines()
+                .get(0));
+        assertTrue(
+            snapshot.toDiagnosticLines()
+                .get(1)
+                .startsWith("[DISABLED:NOT_DEFAULT_ENABLED] a.patch"));
+        assertTrue(
+            snapshot.toDiagnosticLines()
+                .get(2)
+                .startsWith("[ENABLED] z.patch"));
         pass();
     }
 
     private static PatchDescriptor.Builder patch(String id, PatchRisk risk) {
-        return PatchDescriptor.builder(id, id.substring(0, id.indexOf('.'))).risk(risk);
+        return PatchDescriptor.builder(id, id.substring(0, id.indexOf('.')))
+            .risk(risk);
     }
 
     private static PatchResolutionRequest.Builder request(OptimizationProfile profile) {
@@ -225,6 +257,7 @@ public final class PatchRegistrySelfTest {
     }
 
     private interface ThrowingAction {
+
         void run();
     }
 }

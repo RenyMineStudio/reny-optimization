@@ -15,8 +15,10 @@ import java.util.TreeSet;
 /**
  * Central deterministic registry for all Reny optimization patches.
  *
- * <p>The registry decides whether patches may participate. It deliberately does
- * not know how an enabled patch is implemented.</p>
+ * <p>
+ * The registry decides whether patches may participate. It deliberately does
+ * not know how an enabled patch is implemented.
+ * </p>
  */
 public final class PatchRegistry {
 
@@ -71,7 +73,9 @@ public final class PatchRegistry {
         TreeSet<String> referenced = new TreeSet<String>();
         referenced.addAll(request.getExplicitlyEnabled());
         referenced.addAll(request.getExplicitlyDisabled());
-        referenced.addAll(request.getPreconditions().keySet());
+        referenced.addAll(
+            request.getPreconditions()
+                .keySet());
         for (String id : referenced) {
             if (!descriptors.containsKey(id)) {
                 throw new IllegalArgumentException("Resolution request references unknown patch id: " + id);
@@ -79,52 +83,61 @@ public final class PatchRegistry {
         }
     }
 
-    private void selectInitialCandidates(
-        PatchResolutionRequest request,
-        Map<String, PatchDecision> decisions,
+    private void selectInitialCandidates(PatchResolutionRequest request, Map<String, PatchDecision> decisions,
         SortedSet<String> enabled) {
 
         for (PatchDescriptor descriptor : descriptors.values()) {
             String id = descriptor.getId();
 
             if (request.isExplicitlyDisabled(id)) {
-                decisions.put(id, PatchDecision.disabled(
-                    descriptor,
-                    PatchDecisionReason.EXPLICITLY_DISABLED,
-                    "disabled explicitly by configuration"));
+                decisions.put(
+                    id,
+                    PatchDecision.disabled(
+                        descriptor,
+                        PatchDecisionReason.EXPLICITLY_DISABLED,
+                        "disabled explicitly by configuration"));
                 continue;
             }
 
-            if (!request.getProfile().allows(descriptor.getRisk())) {
-                decisions.put(id, PatchDecision.disabled(
-                    descriptor,
-                    PatchDecisionReason.PROFILE_RESTRICTED,
-                    "risk " + descriptor.getRisk() + " is outside profile " + request.getProfile()));
+            if (!request.getProfile()
+                .allows(descriptor.getRisk())) {
+                decisions.put(
+                    id,
+                    PatchDecision.disabled(
+                        descriptor,
+                        PatchDecisionReason.PROFILE_RESTRICTED,
+                        "risk " + descriptor.getRisk() + " is outside profile " + request.getProfile()));
                 continue;
             }
 
             if (!descriptor.isDefaultEnabled() && !request.isExplicitlyEnabled(id)) {
-                decisions.put(id, PatchDecision.disabled(
-                    descriptor,
-                    PatchDecisionReason.NOT_DEFAULT_ENABLED,
-                    "patch is opt-in and was not explicitly enabled"));
+                decisions.put(
+                    id,
+                    PatchDecision.disabled(
+                        descriptor,
+                        PatchDecisionReason.NOT_DEFAULT_ENABLED,
+                        "patch is opt-in and was not explicitly enabled"));
                 continue;
             }
 
             if (descriptor.requiresVerifiedPreconditions()) {
                 PreconditionStatus status = request.getPreconditionStatus(id);
                 if (status == PreconditionStatus.UNKNOWN) {
-                    decisions.put(id, PatchDecision.disabled(
-                        descriptor,
-                        PatchDecisionReason.PRECONDITION_UNKNOWN,
-                        "unsafe patch requires explicit compatibility/environment proof"));
+                    decisions.put(
+                        id,
+                        PatchDecision.disabled(
+                            descriptor,
+                            PatchDecisionReason.PRECONDITION_UNKNOWN,
+                            "unsafe patch requires explicit compatibility/environment proof"));
                     continue;
                 }
                 if (status == PreconditionStatus.UNSATISFIED) {
-                    decisions.put(id, PatchDecision.disabled(
-                        descriptor,
-                        PatchDecisionReason.PRECONDITION_UNSATISFIED,
-                        "compatibility/environment precondition was not satisfied"));
+                    decisions.put(
+                        id,
+                        PatchDecision.disabled(
+                            descriptor,
+                            PatchDecisionReason.PRECONDITION_UNSATISFIED,
+                            "compatibility/environment precondition was not satisfied"));
                     continue;
                 }
             }
@@ -137,9 +150,7 @@ public final class PatchRegistry {
         }
     }
 
-    private void disableMissingDependencies(
-        Map<String, PatchDecision> decisions,
-        SortedSet<String> enabled) {
+    private void disableMissingDependencies(Map<String, PatchDecision> decisions, SortedSet<String> enabled) {
 
         for (String id : new ArrayList<String>(enabled)) {
             PatchDescriptor descriptor = descriptors.get(id);
@@ -157,9 +168,7 @@ public final class PatchRegistry {
         }
     }
 
-    private void disableDependencyCycles(
-        Map<String, PatchDecision> decisions,
-        SortedSet<String> enabled) {
+    private void disableDependencyCycles(Map<String, PatchDecision> decisions, SortedSet<String> enabled) {
 
         SortedSet<String> cycleMembers = findDependencyCycleMembers(enabled);
         if (cycleMembers.isEmpty()) {
@@ -173,9 +182,7 @@ public final class PatchRegistry {
         }
     }
 
-    private void propagateDisabledDependencies(
-        Map<String, PatchDecision> decisions,
-        SortedSet<String> enabled) {
+    private void propagateDisabledDependencies(Map<String, PatchDecision> decisions, SortedSet<String> enabled) {
 
         boolean changed;
         do {
@@ -198,13 +205,12 @@ public final class PatchRegistry {
         } while (changed);
     }
 
-    private void resolveConflicts(
-        final PatchResolutionRequest request,
-        Map<String, PatchDecision> decisions,
+    private void resolveConflicts(final PatchResolutionRequest request, Map<String, PatchDecision> decisions,
         SortedSet<String> enabled) {
 
         ArrayList<String> ordered = new ArrayList<String>(enabled);
         Collections.sort(ordered, new Comparator<String>() {
+
             @Override
             public int compare(String left, String right) {
                 boolean leftExplicit = request.isExplicitlyEnabled(left);
@@ -213,7 +219,11 @@ public final class PatchRegistry {
                     return leftExplicit ? -1 : 1;
                 }
 
-                int risk = descriptors.get(left).getRisk().compareTo(descriptors.get(right).getRisk());
+                int risk = descriptors.get(left)
+                    .getRisk()
+                    .compareTo(
+                        descriptors.get(right)
+                            .getRisk());
                 if (risk != 0) {
                     return risk;
                 }
@@ -253,15 +263,13 @@ public final class PatchRegistry {
     private boolean conflicts(String left, String right) {
         PatchDescriptor leftDescriptor = descriptors.get(left);
         PatchDescriptor rightDescriptor = descriptors.get(right);
-        return leftDescriptor.getConflictingPatchIds().contains(right)
-            || rightDescriptor.getConflictingPatchIds().contains(left);
+        return leftDescriptor.getConflictingPatchIds()
+            .contains(right)
+            || rightDescriptor.getConflictingPatchIds()
+                .contains(left);
     }
 
-    private void disable(
-        String id,
-        PatchDecisionReason reason,
-        String detail,
-        Map<String, PatchDecision> decisions,
+    private void disable(String id, PatchDecisionReason reason, String detail, Map<String, PatchDecision> decisions,
         SortedSet<String> enabled) {
 
         PatchDescriptor descriptor = descriptors.get(id);
@@ -282,12 +290,8 @@ public final class PatchRegistry {
         return cycleMembers;
     }
 
-    private void findCyclesDepthFirst(
-        String id,
-        SortedSet<String> enabled,
-        Map<String, Integer> state,
-        List<String> stack,
-        SortedSet<String> cycleMembers) {
+    private void findCyclesDepthFirst(String id, SortedSet<String> enabled, Map<String, Integer> state,
+        List<String> stack, SortedSet<String> cycleMembers) {
 
         state.put(id, Integer.valueOf(1));
         stack.add(id);

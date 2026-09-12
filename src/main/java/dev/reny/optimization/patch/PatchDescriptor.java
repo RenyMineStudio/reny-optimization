@@ -53,7 +53,8 @@ public final class PatchDescriptor {
 
     static String validateId(String id) {
         String value = validateToken("patch id", id);
-        if (!ID_PATTERN.matcher(value).matches()) {
+        if (!ID_PATTERN.matcher(value)
+            .matches()) {
             throw new IllegalArgumentException(
                 "Invalid patch id '" + value + "'. Expected lowercase stable token such as world.fast_block_lookup");
         }
@@ -61,7 +62,8 @@ public final class PatchDescriptor {
     }
 
     private static String validateToken(String name, String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null || value.trim()
+            .isEmpty()) {
             throw new IllegalArgumentException(name + " must not be blank");
         }
         return value.trim();
@@ -147,6 +149,7 @@ public final class PatchDescriptor {
     }
 
     public static final class Builder {
+
         private final String id;
         private final String module;
         private PatchSide side = PatchSide.BOTH;

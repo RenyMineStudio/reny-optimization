@@ -2,6 +2,7 @@ package dev.reny.optimization.patch;
 
 /** User-selectable optimization envelope. */
 public enum OptimizationProfile {
+
     COMPATIBLE,
     AGGRESSIVE,
     NUCLEAR;

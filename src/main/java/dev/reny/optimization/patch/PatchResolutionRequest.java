@@ -1,7 +1,6 @@
 package dev.reny.optimization.patch;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -28,7 +27,8 @@ public final class PatchResolutionRequest {
         this.profile = builder.profile;
         this.explicitlyEnabled = Collections.unmodifiableSortedSet(new TreeSet<String>(builder.explicitlyEnabled));
         this.explicitlyDisabled = Collections.unmodifiableSortedSet(new TreeSet<String>(builder.explicitlyDisabled));
-        this.preconditions = Collections.unmodifiableSortedMap(new TreeMap<String, PreconditionStatus>(builder.preconditions));
+        this.preconditions = Collections
+            .unmodifiableSortedMap(new TreeMap<String, PreconditionStatus>(builder.preconditions));
     }
 
     public static Builder builder(OptimizationProfile profile) {
@@ -65,6 +65,7 @@ public final class PatchResolutionRequest {
     }
 
     public static final class Builder {
+
         private final OptimizationProfile profile;
         private final SortedSet<String> explicitlyEnabled = new TreeSet<String>();
         private final SortedSet<String> explicitlyDisabled = new TreeSet<String>();

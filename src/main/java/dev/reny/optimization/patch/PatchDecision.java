@@ -8,11 +8,7 @@ public final class PatchDecision {
     private final PatchDecisionReason reason;
     private final String detail;
 
-    private PatchDecision(
-        PatchDescriptor descriptor,
-        boolean enabled,
-        PatchDecisionReason reason,
-        String detail) {
+    private PatchDecision(PatchDescriptor descriptor, boolean enabled, PatchDecisionReason reason, String detail) {
         if (descriptor == null) {
             throw new IllegalArgumentException("descriptor must not be null");
         }
