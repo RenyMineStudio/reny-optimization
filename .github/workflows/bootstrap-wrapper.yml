@@ -1,4 +1,4 @@
-name: Bootstrap Gradle Wrapper
+name: Bootstrap Forge Validation
 
 on:
   push:
@@ -8,11 +8,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: issue-2-wrapper-bootstrap
+  group: issue-2-forge-bootstrap
   cancel-in-progress: true
 
 jobs:
-  bootstrap:
+  validate:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -27,40 +27,25 @@ jobs:
           distribution: temurin
           java-version: '25'
 
-      - name: Install Gradle 9.3.1
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.3.1'
 
-      - name: Generate standard Gradle wrapper
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp="$(mktemp -d)"
-          pushd "$tmp"
-          printf 'rootProject.name = "wrapper-bootstrap"\n' > settings.gradle
-          gradle wrapper --gradle-version 9.3.1 --distribution-type bin
-          popd
-          mkdir -p gradle/wrapper
-          cp "$tmp/gradlew" ./gradlew
-          cp "$tmp/gradlew.bat" ./gradlew.bat
-          cp "$tmp/gradle/wrapper/gradle-wrapper.jar" ./gradle/wrapper/gradle-wrapper.jar
-          cp "$tmp/gradle/wrapper/gradle-wrapper.properties" ./gradle/wrapper/gradle-wrapper.properties
-          chmod +x ./gradlew
+      - name: Apply repository formatting
+        run: ./gradlew spotlessApply --stacktrace
 
-      - name: Commit generated wrapper
+      - name: Commit formatter output
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+          git add src
           if ! git diff --cached --quiet; then
-            git commit -m 'build: add Gradle 9.3.1 wrapper'
+            git commit -m 'style: apply GTNH formatting'
             git push origin HEAD:issue-2-forge-rfg-bootstrap
           fi
 
-      - name: Build Forge mod
+      - name: Build and reobfuscate Forge mod
         run: ./gradlew build --stacktrace
 
       - name: Verify Java 8 bytecode
@@ -79,3 +64,19 @@ jobs:
           grep -q 'runClient' build/task-list.txt
           grep -q 'runServer' build/task-list.txt
           grep -q 'setupDecompWorkspace' build/task-list.txt
+
+      - name: Verify UniMixins runtime dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew dependencies --configuration runtimeClasspath > build/runtime-dependencies.txt
+          grep -qi 'unimixins' build/runtime-dependencies.txt
+
+      - name: Verify packaged mod
+        shell: bash
+        run: |
+          set -euo pipefail
+          jar_file="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' | head -n 1)"
+          test -n "$jar_file"
+          jar tf "$jar_file" | grep -q '^mcmod.info$'
+          jar tf "$jar_file" | grep -q '^dev/reny/optimization/RenyOptimization.class$'
