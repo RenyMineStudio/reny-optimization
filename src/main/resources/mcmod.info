@@ -1,0 +1,21 @@
+{
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "Measurement-driven performance runtime for heavily modded Minecraft 1.7.10.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/pedroteste00000008-stack/reny-optimization",
+    "updateUrl": "",
+    "authorList": ["Pedro"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "parent": "",
+    "requiredMods": [],
+    "dependencies": [],
+    "dependants": [],
+    "useDependencyInformation": false
+  }]
+}
