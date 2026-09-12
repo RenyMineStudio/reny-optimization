@@ -13,19 +13,20 @@ Hot-path collection follows four rules:
 
 Instrumentation can be disabled globally or by group. The disabled path checks volatile primitive state and returns `InternalProfiler.DISABLED_TOKEN` without calling `System.nanoTime()`.
 
+Frame/tick ring buffers use a single-writer publication sequence. Snapshots retry if they observe a write in progress or if the buffer changes while being copied, so exported samples are never assembled from a partially published record.
+
 ## IDs and correlation
 
-Every measured frame receives a monotonically increasing `frame_id`. Every measured tick receives a monotonically increasing `tick_id`.
+Every measured frame receives a monotonically increasing `frame_id`. Every measured simulation/server tick receives a monotonically increasing `tick_id`.
 
-`frames.csv` stores the `tick_id` visible when the frame completed. `ticks.csv` stores the `frame_id` visible when the tick completed. These IDs let later chunk, lighting, GC, and section data be related to the same period.
+`frames.csv` stores the most recently visible `tick_id` when the frame completed. `ticks.csv` stores the most recently visible `frame_id` when the server tick completed. These IDs let later chunk, lighting, GC, and section data be related to the same time interval without forcing the render and integrated-server threads through a synchronized correlation map.
 
 The initial Forge hooks measure:
 
-- `RenderTickEvent` on clients for frametime;
-- `ClientTickEvent` on physical clients for client MSPT;
-- `ServerTickEvent` on physical dedicated servers for server MSPT.
+- `RenderTickEvent` for client frametime;
+- `ServerTickEvent` for simulation MSPT on both dedicated and integrated servers.
 
-An integrated client intentionally does not double-count its integrated-server tick in this first layer. Deeper simulation timing will be added through explicit section hooks.
+Client ticks are deliberately not reported as MSPT. This keeps `tick_id` tied to the game simulation rather than mixing client-loop and server-loop durations in one series. Deeper client-specific timing can be added later as a separate metric series.
 
 ## Rolling windows and percentiles
 
