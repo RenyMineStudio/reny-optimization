@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "scenarios": [
+    {"id": "BENCH-01", "name": "Stationary render", "purpose": "Renderer baseline, shader cost, and static-scene frame-time distribution"},
+    {"id": "BENCH-02", "name": "Chunk traversal", "purpose": "Chunk loading/generation, lighting, mesh rebuild/upload, and I/O stutter"},
+    {"id": "BENCH-03", "name": "Industrial base", "purpose": "TileEntity ticking, Forge events, machine networks, and complex block rendering"},
+    {"id": "BENCH-04", "name": "Entity stress", "purpose": "AI, collision, entity ticking/rendering, and allocation behavior"},
+    {"id": "BENCH-05", "name": "Lighting torture", "purpose": "Large-scale block-light and sky-light propagation"},
+    {"id": "BENCH-06", "name": "Shader torture", "purpose": "Shader pass cost and CPU/GPU renderer interaction"},
+    {"id": "BENCH-07", "name": "Dimension transition", "purpose": "World initialization, I/O, memory spikes, and GC"},
+    {"id": "BENCH-08", "name": "Startup/world load", "purpose": "Process startup through first usable world frame"},
+    {"id": "BENCH-99", "name": "Monster", "purpose": "Extreme combined stress used to expose scaling limits"}
+  ]
+}
