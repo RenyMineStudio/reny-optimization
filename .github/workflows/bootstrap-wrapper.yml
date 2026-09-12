@@ -48,6 +48,18 @@ jobs:
           cp "$tmp/gradle/wrapper/gradle-wrapper.properties" ./gradle/wrapper/gradle-wrapper.properties
           chmod +x ./gradlew
 
+      - name: Commit generated wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: add Gradle 9.3.1 wrapper'
+            git push origin HEAD:issue-2-forge-rfg-bootstrap
+          fi
+
       - name: Build Forge mod
         run: ./gradlew build --stacktrace
 
@@ -67,16 +79,3 @@ jobs:
           grep -q 'runClient' build/task-list.txt
           grep -q 'runServer' build/task-list.txt
           grep -q 'setupDecompWorkspace' build/task-list.txt
-
-      - name: Commit generated wrapper
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git commit -m 'build: add Gradle 9.3.1 wrapper'
-          git push origin HEAD:issue-2-forge-rfg-bootstrap
