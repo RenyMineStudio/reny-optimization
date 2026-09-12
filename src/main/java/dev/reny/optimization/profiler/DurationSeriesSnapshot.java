@@ -1,5 +1,7 @@
 package dev.reny.optimization.profiler;
 
+import java.util.Arrays;
+
 /** Immutable chronological copy of a fixed-size duration window. */
 public final class DurationSeriesSnapshot {
 
@@ -39,5 +41,26 @@ public final class DurationSeriesSnapshot {
 
     public DurationStatistics getStatistics() {
         return statistics;
+    }
+
+    /**
+     * Returns only retained samples whose monotonic ID is greater than {@code exclusiveId}.
+     *
+     * <p>This is primarily used by benchmark sessions to exclude warmup samples without resetting the global profiler.</p>
+     */
+    public DurationSeriesSnapshot afterId(long exclusiveId) {
+        int first = 0;
+        while (first < ids.length && ids[first] <= exclusiveId) {
+            first++;
+        }
+        if (first == 0) {
+            return this;
+        }
+        int retained = ids.length - first;
+        return new DurationSeriesSnapshot(
+            retained,
+            Arrays.copyOfRange(ids, first, ids.length),
+            Arrays.copyOfRange(correlationIds, first, correlationIds.length),
+            Arrays.copyOfRange(durationsNanos, first, durationsNanos.length));
     }
 }
