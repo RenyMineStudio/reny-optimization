@@ -1,0 +1,223 @@
+{
+  "scenario": "BENCH-01",
+  "configuration": "A",
+  "configuration_id": "minimal-shaders-off",
+  "profiled_seconds": 20,
+  "gpu_samples_count": 42,
+  "gpu_act_freq_min_mhz": 300.0,
+  "gpu_act_freq_max_mhz": 950.0,
+  "gpu_act_freq_mean_mhz": 505.95238095238096,
+  "at_max_clock_percentage": 0.0,
+  "gpu_samples": [
+    {
+      "time": 1789705524.4795866,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705524.980082,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705525.481593,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705525.9820826,
+      "act_freq_mhz": 950.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705526.4827604,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705526.9833076,
+      "act_freq_mhz": 950.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705527.4838054,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705527.9843392,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705528.4847627,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705528.9865336,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705529.4869492,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705529.9873846,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705530.4878042,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705530.9882958,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705531.4887197,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705531.989155,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705532.489596,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705532.9903312,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705533.4962778,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705533.996762,
+      "act_freq_mhz": 950.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705534.4972486,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705534.997877,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705535.4983087,
+      "act_freq_mhz": 900.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705535.9989183,
+      "act_freq_mhz": 950.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705536.4997058,
+      "act_freq_mhz": 950.0,
+      "cur_freq_mhz": 1200.0
+    },
+    {
+      "time": 1789705537.0030956,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705537.503595,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705538.0039892,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705538.5043669,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705539.0048125,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705539.505254,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705540.00567,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705540.5060627,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705541.0065513,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705541.507054,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705542.010829,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705542.511232,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705543.011705,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705543.5122917,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705544.0129206,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705544.5135612,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    },
+    {
+      "time": 1789705545.024499,
+      "act_freq_mhz": 300.0,
+      "cur_freq_mhz": 300.0
+    }
+  ]
+}
